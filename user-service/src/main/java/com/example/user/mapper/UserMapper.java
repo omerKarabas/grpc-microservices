@@ -6,11 +6,9 @@ import com.example.user.UserProto.CreateUserRequest;
 import com.example.user.UserProto.UpdateUserRequest;
 import com.example.user.entity.ContactAddress;
 import com.example.user.entity.User;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Component
-@Slf4j
 public class UserMapper {
 
     public CommonProto.User toProto(User user) {

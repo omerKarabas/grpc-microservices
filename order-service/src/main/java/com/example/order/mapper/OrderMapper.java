@@ -5,14 +5,12 @@ import com.example.common.util.CollectionUtil;
 import com.example.order.entity.OrderEntity;
 import com.example.order.entity.OrderItemEntity;
 import com.example.order.entity.OrderStatus;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Component
-@Slf4j
 public class OrderMapper {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
