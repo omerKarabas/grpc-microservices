@@ -4,6 +4,7 @@ import com.example.common.CommonProto.*;
 import com.example.common.ResponseBuilder;
 import com.example.common.util.StreamResponseHandler;
 import com.example.order.OrderProto.*;
+import com.example.order.constants.OrderErrorCode;
 import com.example.order.entity.OrderEntity;
 import com.example.order.entity.OrderItemEntity;
 import com.example.order.entity.OrderStatus;
@@ -40,7 +41,7 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
             ValidateUserResponse customerValidation = validateCustomer(orderCreationRequest.getUserId());
             if (!customerValidation.getIsValid()) {
                 StreamResponseHandler.respond(responseObserver, CreateOrderResponse.newBuilder()
-                        .setResponse(ResponseBuilder.error("Invalid customer: " + customerValidation.getErrorMessage(), "INVALID_CUSTOMER"))
+                        .setResponse(ResponseBuilder.error(OrderErrorCode.INVALID_CUSTOMER.getMessage() + ": " + customerValidation.getErrorMessage(), OrderErrorCode.INVALID_CUSTOMER.getCode()))
                         .build());
                 return;
             }
@@ -74,7 +75,7 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
         } catch (Exception e) {
             log.error("Error creating order", e);
             StreamResponseHandler.respond(responseObserver, CreateOrderResponse.newBuilder()
-                    .setResponse(ResponseBuilder.error("Failed to create order: " + e.getMessage(), "ORDER_CREATE_ERROR"))
+                    .setResponse(ResponseBuilder.error(OrderErrorCode.ORDER_CREATE_ERROR.getMessage() + ": " + e.getMessage(), OrderErrorCode.ORDER_CREATE_ERROR.getCode()))
                     .build());
         }
     }
@@ -88,7 +89,7 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
             
             if (orderEntityOpt.isEmpty()) {
                 StreamResponseHandler.respond(responseObserver, GetOrderResponse.newBuilder()
-                        .setResponse(ResponseBuilder.error("Order not found", "ORDER_NOT_FOUND"))
+                        .setResponse(ResponseBuilder.error(OrderErrorCode.ORDER_NOT_FOUND.getMessage(), OrderErrorCode.ORDER_NOT_FOUND.getCode()))
                         .build());
                 return;
             }
@@ -98,7 +99,7 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
             
             if (!customerResponse.getResponse().getSuccess()) {
                 StreamResponseHandler.respond(responseObserver, GetOrderResponse.newBuilder()
-                        .setResponse(ResponseBuilder.error("Customer not found for order", "CUSTOMER_NOT_FOUND"))
+                        .setResponse(ResponseBuilder.error(OrderErrorCode.CUSTOMER_NOT_FOUND.getMessage(), OrderErrorCode.CUSTOMER_NOT_FOUND.getCode()))
                         .build());
                 return;
             }
@@ -114,7 +115,7 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
         } catch (Exception e) {
             log.error("Error getting order", e);
             StreamResponseHandler.respond(responseObserver, GetOrderResponse.newBuilder()
-                    .setResponse(ResponseBuilder.error("Failed to get order: " + e.getMessage(), "ORDER_FETCH_ERROR"))
+                    .setResponse(ResponseBuilder.error(OrderErrorCode.ORDER_FETCH_ERROR.getMessage() + ": " + e.getMessage(), OrderErrorCode.ORDER_FETCH_ERROR.getCode()))
                     .build());
         }
     }
@@ -128,7 +129,7 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
             
             if (existingOrderOpt.isEmpty()) {
                 StreamResponseHandler.respond(responseObserver, UpdateOrderStatusResponse.newBuilder()
-                        .setResponse(ResponseBuilder.error("Order to update not found", "ORDER_NOT_FOUND"))
+                        .setResponse(ResponseBuilder.error(OrderErrorCode.ORDER_TO_UPDATE_NOT_FOUND.getMessage(), OrderErrorCode.ORDER_TO_UPDATE_NOT_FOUND.getCode()))
                         .build());
                 return;
             }
@@ -147,7 +148,7 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
         } catch (Exception e) {
             log.error("Error updating order status", e);
             StreamResponseHandler.respond(responseObserver, UpdateOrderStatusResponse.newBuilder()
-                    .setResponse(ResponseBuilder.error("Failed to update order status: " + e.getMessage(), "ORDER_UPDATE_ERROR"))
+                    .setResponse(ResponseBuilder.error(OrderErrorCode.ORDER_UPDATE_ERROR.getMessage() + ": " + e.getMessage(), OrderErrorCode.ORDER_UPDATE_ERROR.getCode()))
                     .build());
         }
     }
@@ -160,7 +161,7 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
             ValidateUserResponse customerValidation = validateCustomer(request.getUserId());
             if (!customerValidation.getIsValid()) {
                 StreamResponseHandler.respond(responseObserver, GetUserOrdersResponse.newBuilder()
-                        .setResponse(ResponseBuilder.error("Invalid customer: " + customerValidation.getErrorMessage(), "INVALID_CUSTOMER"))
+                        .setResponse(ResponseBuilder.error(OrderErrorCode.INVALID_CUSTOMER.getMessage() + ": " + customerValidation.getErrorMessage(), OrderErrorCode.INVALID_CUSTOMER.getCode()))
                         .build());
                 return;
             }
@@ -179,7 +180,7 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
         } catch (Exception e) {
             log.error("Error fetching user orders", e);
             StreamResponseHandler.respond(responseObserver, GetUserOrdersResponse.newBuilder()
-                    .setResponse(ResponseBuilder.error("Failed to fetch user orders: " + e.getMessage(), "ORDER_FETCH_ERROR"))
+                    .setResponse(ResponseBuilder.error(OrderErrorCode.ORDER_FETCH_ERROR.getMessage() + ": " + e.getMessage(), OrderErrorCode.ORDER_FETCH_ERROR.getCode()))
                     .build());
         }
     }
@@ -193,7 +194,7 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
             
             if (existingOrderOpt.isEmpty()) {
                 StreamResponseHandler.respond(responseObserver, CancelOrderResponse.newBuilder()
-                        .setResponse(ResponseBuilder.error("Order to cancel not found", "ORDER_NOT_FOUND"))
+                        .setResponse(ResponseBuilder.error(OrderErrorCode.ORDER_TO_CANCEL_NOT_FOUND.getMessage(), OrderErrorCode.ORDER_TO_CANCEL_NOT_FOUND.getCode()))
                         .build());
                 return;
             }
@@ -202,7 +203,7 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
             
             if (existingOrder.getCurrentStatus() == OrderStatus.DELIVERED) {
                 StreamResponseHandler.respond(responseObserver, CancelOrderResponse.newBuilder()
-                        .setResponse(ResponseBuilder.error("Cannot cancel delivered order", "ORDER_CANNOT_CANCEL"))
+                        .setResponse(ResponseBuilder.error(OrderErrorCode.ORDER_CANNOT_CANCEL.getMessage(), OrderErrorCode.ORDER_CANNOT_CANCEL.getCode()))
                         .build());
                 return;
             }
@@ -219,7 +220,7 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
         } catch (Exception e) {
             log.error("Error cancelling order", e);
             StreamResponseHandler.respond(responseObserver, CancelOrderResponse.newBuilder()
-                    .setResponse(ResponseBuilder.error("Failed to cancel order: " + e.getMessage(), "ORDER_CANCEL_ERROR"))
+                    .setResponse(ResponseBuilder.error(OrderErrorCode.ORDER_CANCEL_ERROR.getMessage() + ": " + e.getMessage(), OrderErrorCode.ORDER_CANCEL_ERROR.getCode()))
                     .build());
         }
     }

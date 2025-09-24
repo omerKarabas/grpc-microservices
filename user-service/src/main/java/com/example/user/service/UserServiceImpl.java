@@ -4,6 +4,7 @@ import com.example.common.CommonProto;
 import com.example.common.ResponseBuilder;
 import com.example.common.util.StreamResponseHandler;
 import com.example.user.UserProto.*;
+import com.example.user.constants.UserErrorCode;
 import com.example.user.entity.User;
 import com.example.user.mapper.UserMapper;
 import com.example.user.repository.UserRepository;
@@ -31,7 +32,7 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
         try {
             if (userRepository.existsByEmailAddress(createRequest.getEmail())) {
                 StreamResponseHandler.respond(responseObserver, CreateUserResponse.newBuilder()
-                        .setResponse(ResponseBuilder.error("User with email already exists", "USER_ALREADY_EXISTS"))
+                        .setResponse(ResponseBuilder.error(UserErrorCode.USER_ALREADY_EXISTS.getMessage(), UserErrorCode.USER_ALREADY_EXISTS.getCode()))
                         .build());
                 return;
             }
@@ -49,7 +50,7 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
         } catch (Exception e) {
             log.error("Error creating user", e);
             StreamResponseHandler.respond(responseObserver, CreateUserResponse.newBuilder()
-                    .setResponse(ResponseBuilder.error("Failed to create user: " + e.getMessage(), "USER_CREATE_ERROR"))
+                    .setResponse(ResponseBuilder.error(UserErrorCode.USER_CREATE_ERROR.getMessage() + ": " + e.getMessage(), UserErrorCode.USER_CREATE_ERROR.getCode()))
                     .build());
         }
     }
@@ -63,7 +64,7 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
             
             if (foundUser.isEmpty()) {
                 StreamResponseHandler.respond(responseObserver, GetUserResponse.newBuilder()
-                        .setResponse(ResponseBuilder.error("User not found", "USER_NOT_FOUND"))
+                        .setResponse(ResponseBuilder.error(UserErrorCode.USER_NOT_FOUND.getMessage(), UserErrorCode.USER_NOT_FOUND.getCode()))
                         .build());
                 return;
             }
@@ -77,7 +78,7 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
         } catch (Exception e) {
             log.error("Error fetching user", e);
             StreamResponseHandler.respond(responseObserver, GetUserResponse.newBuilder()
-                    .setResponse(ResponseBuilder.error("Failed to fetch user: " + e.getMessage(), "USER_FETCH_ERROR"))
+                    .setResponse(ResponseBuilder.error(UserErrorCode.USER_FETCH_ERROR.getMessage() + ": " + e.getMessage(), UserErrorCode.USER_FETCH_ERROR.getCode()))
                     .build());
         }
     }
@@ -91,7 +92,7 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
             
             if (existingUserOpt.isEmpty()) {
                 StreamResponseHandler.respond(responseObserver, UpdateUserResponse.newBuilder()
-                        .setResponse(ResponseBuilder.error("User to update not found", "USER_NOT_FOUND"))
+                        .setResponse(ResponseBuilder.error(UserErrorCode.USER_TO_UPDATE_NOT_FOUND.getMessage(), UserErrorCode.USER_TO_UPDATE_NOT_FOUND.getCode()))
                         .build());
                 return;
             }
@@ -110,7 +111,7 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
         } catch (Exception e) {
             log.error("Error updating user", e);
             StreamResponseHandler.respond(responseObserver, UpdateUserResponse.newBuilder()
-                    .setResponse(ResponseBuilder.error("Failed to update user: " + e.getMessage(), "USER_UPDATE_ERROR"))
+                    .setResponse(ResponseBuilder.error(UserErrorCode.USER_UPDATE_ERROR.getMessage() + ": " + e.getMessage(), UserErrorCode.USER_UPDATE_ERROR.getCode()))
                     .build());
         }
     }
@@ -122,7 +123,7 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
         try {
             if (!userRepository.existsById(deleteRequest.getUserId())) {
                 StreamResponseHandler.respond(responseObserver, DeleteUserResponse.newBuilder()
-                        .setResponse(ResponseBuilder.error("User to delete not found", "USER_NOT_FOUND"))
+                        .setResponse(ResponseBuilder.error(UserErrorCode.USER_TO_DELETE_NOT_FOUND.getMessage(), UserErrorCode.USER_TO_DELETE_NOT_FOUND.getCode()))
                         .build());
                 return;
             }
@@ -135,7 +136,7 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
         } catch (Exception e) {
             log.error("Error deleting user", e);
             StreamResponseHandler.respond(responseObserver, DeleteUserResponse.newBuilder()
-                    .setResponse(ResponseBuilder.error("Failed to delete user: " + e.getMessage(), "USER_DELETE_ERROR"))
+                    .setResponse(ResponseBuilder.error(UserErrorCode.USER_DELETE_ERROR.getMessage() + ": " + e.getMessage(), UserErrorCode.USER_DELETE_ERROR.getCode()))
                     .build());
         }
     }
