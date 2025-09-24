@@ -2,6 +2,7 @@ package com.example.order.service;
 
 import com.example.common.CommonProto.*;
 import com.example.common.ResponseBuilder;
+import com.example.common.constants.SpecialChars;
 import com.example.common.util.StreamResponseHandler;
 import com.example.order.OrderProto.*;
 import com.example.order.constants.OrderErrorCode;
@@ -41,7 +42,7 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
             ValidateUserResponse customerValidation = validateCustomer(orderCreationRequest.getUserId());
             if (!customerValidation.getIsValid()) {
                 StreamResponseHandler.respond(responseObserver, CreateOrderResponse.newBuilder()
-                        .setResponse(ResponseBuilder.error(OrderErrorCode.INVALID_CUSTOMER.getMessage() + ": " + customerValidation.getErrorMessage(), OrderErrorCode.INVALID_CUSTOMER.getCode()))
+                        .setResponse(ResponseBuilder.error(OrderErrorCode.INVALID_CUSTOMER.getMessage() + SpecialChars.COLON_SPACE.getValue() + customerValidation.getErrorMessage(), OrderErrorCode.INVALID_CUSTOMER.getCode()))
                         .build());
                 return;
             }
@@ -75,7 +76,7 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
         } catch (Exception e) {
             log.error("Error creating order", e);
             StreamResponseHandler.respond(responseObserver, CreateOrderResponse.newBuilder()
-                    .setResponse(ResponseBuilder.error(OrderErrorCode.ORDER_CREATE_ERROR.getMessage() + ": " + e.getMessage(), OrderErrorCode.ORDER_CREATE_ERROR.getCode()))
+                    .setResponse(ResponseBuilder.error(OrderErrorCode.ORDER_CREATE_ERROR.getMessage() + SpecialChars.COLON_SPACE.getValue() + e.getMessage(), OrderErrorCode.ORDER_CREATE_ERROR.getCode()))
                     .build());
         }
     }
@@ -115,7 +116,7 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
         } catch (Exception e) {
             log.error("Error getting order", e);
             StreamResponseHandler.respond(responseObserver, GetOrderResponse.newBuilder()
-                    .setResponse(ResponseBuilder.error(OrderErrorCode.ORDER_FETCH_ERROR.getMessage() + ": " + e.getMessage(), OrderErrorCode.ORDER_FETCH_ERROR.getCode()))
+                    .setResponse(ResponseBuilder.error(OrderErrorCode.ORDER_FETCH_ERROR.getMessage() + SpecialChars.COLON_SPACE.getValue() + e.getMessage(), OrderErrorCode.ORDER_FETCH_ERROR.getCode()))
                     .build());
         }
     }
@@ -148,7 +149,7 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
         } catch (Exception e) {
             log.error("Error updating order status", e);
             StreamResponseHandler.respond(responseObserver, UpdateOrderStatusResponse.newBuilder()
-                    .setResponse(ResponseBuilder.error(OrderErrorCode.ORDER_UPDATE_ERROR.getMessage() + ": " + e.getMessage(), OrderErrorCode.ORDER_UPDATE_ERROR.getCode()))
+                    .setResponse(ResponseBuilder.error(OrderErrorCode.ORDER_UPDATE_ERROR.getMessage() + SpecialChars.COLON_SPACE.getValue() + e.getMessage(), OrderErrorCode.ORDER_UPDATE_ERROR.getCode()))
                     .build());
         }
     }
@@ -161,7 +162,7 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
             ValidateUserResponse customerValidation = validateCustomer(request.getUserId());
             if (!customerValidation.getIsValid()) {
                 StreamResponseHandler.respond(responseObserver, GetUserOrdersResponse.newBuilder()
-                        .setResponse(ResponseBuilder.error(OrderErrorCode.INVALID_CUSTOMER.getMessage() + ": " + customerValidation.getErrorMessage(), OrderErrorCode.INVALID_CUSTOMER.getCode()))
+                        .setResponse(ResponseBuilder.error(OrderErrorCode.INVALID_CUSTOMER.getMessage() + SpecialChars.COLON_SPACE.getValue() + customerValidation.getErrorMessage(), OrderErrorCode.INVALID_CUSTOMER.getCode()))
                         .build());
                 return;
             }
@@ -180,7 +181,7 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
         } catch (Exception e) {
             log.error("Error fetching user orders", e);
             StreamResponseHandler.respond(responseObserver, GetUserOrdersResponse.newBuilder()
-                    .setResponse(ResponseBuilder.error(OrderErrorCode.ORDER_FETCH_ERROR.getMessage() + ": " + e.getMessage(), OrderErrorCode.ORDER_FETCH_ERROR.getCode()))
+                    .setResponse(ResponseBuilder.error(OrderErrorCode.ORDER_FETCH_ERROR.getMessage() + SpecialChars.COLON_SPACE.getValue() + e.getMessage(), OrderErrorCode.ORDER_FETCH_ERROR.getCode()))
                     .build());
         }
     }
@@ -220,7 +221,7 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
         } catch (Exception e) {
             log.error("Error cancelling order", e);
             StreamResponseHandler.respond(responseObserver, CancelOrderResponse.newBuilder()
-                    .setResponse(ResponseBuilder.error(OrderErrorCode.ORDER_CANCEL_ERROR.getMessage() + ": " + e.getMessage(), OrderErrorCode.ORDER_CANCEL_ERROR.getCode()))
+                    .setResponse(ResponseBuilder.error(OrderErrorCode.ORDER_CANCEL_ERROR.getMessage() + SpecialChars.COLON_SPACE.getValue() + e.getMessage(), OrderErrorCode.ORDER_CANCEL_ERROR.getCode()))
                     .build());
         }
     }

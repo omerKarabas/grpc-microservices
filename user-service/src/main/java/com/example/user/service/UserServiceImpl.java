@@ -2,6 +2,7 @@ package com.example.user.service;
 
 import com.example.common.CommonProto;
 import com.example.common.ResponseBuilder;
+import com.example.common.constants.SpecialChars;
 import com.example.common.util.StreamResponseHandler;
 import com.example.user.UserProto.*;
 import com.example.user.constants.UserErrorCode;
@@ -50,7 +51,7 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
         } catch (Exception e) {
             log.error("Error creating user", e);
             StreamResponseHandler.respond(responseObserver, CreateUserResponse.newBuilder()
-                    .setResponse(ResponseBuilder.error(UserErrorCode.USER_CREATE_ERROR.getMessage() + ": " + e.getMessage(), UserErrorCode.USER_CREATE_ERROR.getCode()))
+                    .setResponse(ResponseBuilder.error(UserErrorCode.USER_CREATE_ERROR.getMessage() + SpecialChars.COLON_SPACE.getValue() + e.getMessage(), UserErrorCode.USER_CREATE_ERROR.getCode()))
                     .build());
         }
     }
@@ -78,7 +79,7 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
         } catch (Exception e) {
             log.error("Error fetching user", e);
             StreamResponseHandler.respond(responseObserver, GetUserResponse.newBuilder()
-                    .setResponse(ResponseBuilder.error(UserErrorCode.USER_FETCH_ERROR.getMessage() + ": " + e.getMessage(), UserErrorCode.USER_FETCH_ERROR.getCode()))
+                    .setResponse(ResponseBuilder.error(UserErrorCode.USER_FETCH_ERROR.getMessage() + SpecialChars.COLON_SPACE.getValue() + e.getMessage(), UserErrorCode.USER_FETCH_ERROR.getCode()))
                     .build());
         }
     }
@@ -111,7 +112,7 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
         } catch (Exception e) {
             log.error("Error updating user", e);
             StreamResponseHandler.respond(responseObserver, UpdateUserResponse.newBuilder()
-                    .setResponse(ResponseBuilder.error(UserErrorCode.USER_UPDATE_ERROR.getMessage() + ": " + e.getMessage(), UserErrorCode.USER_UPDATE_ERROR.getCode()))
+                    .setResponse(ResponseBuilder.error(UserErrorCode.USER_UPDATE_ERROR.getMessage() + SpecialChars.COLON_SPACE.getValue() + e.getMessage(), UserErrorCode.USER_UPDATE_ERROR.getCode()))
                     .build());
         }
     }
@@ -136,7 +137,7 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
         } catch (Exception e) {
             log.error("Error deleting user", e);
             StreamResponseHandler.respond(responseObserver, DeleteUserResponse.newBuilder()
-                    .setResponse(ResponseBuilder.error(UserErrorCode.USER_DELETE_ERROR.getMessage() + ": " + e.getMessage(), UserErrorCode.USER_DELETE_ERROR.getCode()))
+                    .setResponse(ResponseBuilder.error(UserErrorCode.USER_DELETE_ERROR.getMessage() + SpecialChars.COLON_SPACE.getValue() + e.getMessage(), UserErrorCode.USER_DELETE_ERROR.getCode()))
                     .build());
         }
     }
