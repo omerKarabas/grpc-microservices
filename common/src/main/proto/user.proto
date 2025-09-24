@@ -1,0 +1,88 @@
+syntax = "proto3";
+
+package com.example.user;
+
+import "common.proto";
+
+option java_package = "com.example.user";
+option java_outer_classname = "UserProto";
+
+// User Service definition
+service UserService {
+  // Create a new user
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+  
+  // Get user information
+  rpc GetUser(GetUserRequest) returns (GetUserResponse);
+  
+  // Update user information
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
+  
+  // Delete a user
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse);
+  
+  // Validate user (for Order Service)
+  rpc ValidateUser(ValidateUserRequest) returns (ValidateUserResponse);
+}
+
+// Create user request
+message CreateUserRequest {
+  string name = 1;
+  string email = 2;
+  string phone = 3;
+  com.example.common.Address address = 4;
+}
+
+// Create user response
+message CreateUserResponse {
+  com.example.common.ApiResponse response = 1;
+  com.example.common.User user = 2;
+}
+
+// Get user request
+message GetUserRequest {
+  int64 userId = 1;
+}
+
+// Get user response
+message GetUserResponse {
+  com.example.common.ApiResponse response = 1;
+  com.example.common.User user = 2;
+}
+
+// Update user request
+message UpdateUserRequest {
+  int64 userId = 1;
+  string name = 2;
+  string email = 3;
+  string phone = 4;
+  com.example.common.Address address = 5;
+}
+
+// Update user response
+message UpdateUserResponse {
+  com.example.common.ApiResponse response = 1;
+  com.example.common.User user = 2;
+}
+
+// Delete user request
+message DeleteUserRequest {
+  int64 userId = 1;
+}
+
+// Delete user response
+message DeleteUserResponse {
+  com.example.common.ApiResponse response = 1;
+}
+
+// Validate user request (for Order Service)
+message ValidateUserRequest {
+  int64 userId = 1;
+}
+
+// Validate user response (for Order Service)
+message ValidateUserResponse {
+  bool isValid = 1;
+  com.example.common.User user = 2;
+  string errorMessage = 3;
+}

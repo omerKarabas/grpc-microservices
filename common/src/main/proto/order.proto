@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+package com.example.order;
+
+import "common.proto";
+
+option java_package = "com.example.order";
+option java_outer_classname = "OrderProto";
+
+// Order Service definition
+service OrderService {
+  // Create a new order
+  rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);
+  
+  // Get order information
+  rpc GetOrder(GetOrderRequest) returns (GetOrderResponse);
+  
+  // Update order status
+  rpc UpdateOrderStatus(UpdateOrderStatusRequest) returns (UpdateOrderStatusResponse);
+  
+  // Get user orders
+  rpc GetUserOrders(GetUserOrdersRequest) returns (GetUserOrdersResponse);
+  
+  // Cancel an order
+  rpc CancelOrder(CancelOrderRequest) returns (CancelOrderResponse);
+}
+
+// Create order request
+message CreateOrderRequest {
+  int64 userId = 1;
+  repeated com.example.common.OrderItem items = 2;
+}
+
+// Create order response
+message CreateOrderResponse {
+  com.example.common.ApiResponse response = 1;
+  com.example.common.Order order = 2;
+  com.example.common.User user = 3; // User information from User Service
+}
+
+// Get order request
+message GetOrderRequest {
+  int64 orderId = 1;
+}
+
+// Get order response
+message GetOrderResponse {
+  com.example.common.ApiResponse response = 1;
+  com.example.common.Order order = 2;
+  com.example.common.User user = 3; // User information from User Service
+}
+
+// Update order status request
+message UpdateOrderStatusRequest {
+  int64 orderId = 1;
+  com.example.common.OrderStatus status = 2;
+}
+
+// Update order status response
+message UpdateOrderStatusResponse {
+  com.example.common.ApiResponse response = 1;
+  com.example.common.Order order = 2;
+}
+
+// Get user orders request
+message GetUserOrdersRequest {
+  int64 userId = 1;
+}
+
+// Get user orders response
+message GetUserOrdersResponse {
+  com.example.common.ApiResponse response = 1;
+  repeated com.example.common.Order orders = 2;
+  com.example.common.User user = 3; // User information from User Service
+}
+
+// Cancel order request
+message CancelOrderRequest {
+  int64 orderId = 1;
+}
+
+// Cancel order response
+message CancelOrderResponse {
+  com.example.common.ApiResponse response = 1;
+  com.example.common.Order order = 2;
+}

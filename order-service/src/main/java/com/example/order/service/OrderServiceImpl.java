@@ -1,0 +1,241 @@
+package com.example.order.service;
+
+import com.example.common.CommonProto.*;
+import com.example.common.ResponseBuilder;
+import com.example.common.util.StreamResponseHandler;
+import com.example.order.OrderProto.*;
+import com.example.order.entity.OrderEntity;
+import com.example.order.entity.OrderItemEntity;
+import com.example.order.entity.OrderStatus;
+import com.example.order.mapper.OrderMapper;
+import com.example.order.repository.OrderRepository;
+import com.example.user.UserProto.*;
+import io.grpc.stub.StreamObserver;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.devh.boot.grpc.client.inject.GrpcClient;
+import net.devh.boot.grpc.server.service.GrpcService;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@GrpcService
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderServiceImplBase {
+    
+    @GrpcClient("user-service")
+    private com.example.user.UserServiceGrpc.UserServiceBlockingStub userServiceStub;
+    
+    private final OrderRepository orderRepository;
+    private final OrderMapper orderMapper;
+
+    @Override
+    public void createOrder(CreateOrderRequest orderCreationRequest, StreamObserver<CreateOrderResponse> responseObserver) {
+        log.info("Creating order for customer: {}, Items: {}", orderCreationRequest.getUserId(), orderCreationRequest.getItemsCount());
+        
+        try {
+            ValidateUserResponse customerValidation = validateCustomer(orderCreationRequest.getUserId());
+            if (!customerValidation.getIsValid()) {
+                StreamResponseHandler.respond(responseObserver, CreateOrderResponse.newBuilder()
+                        .setResponse(ResponseBuilder.error("Invalid customer: " + customerValidation.getErrorMessage(), "INVALID_CUSTOMER"))
+                        .build());
+                return;
+            }
+            
+            double calculatedTotalPrice = orderCreationRequest.getItemsList().stream()
+                    .mapToDouble(item -> item.getPrice() * item.getQuantity())
+                    .sum();
+            
+            OrderEntity newOrder = OrderEntity.builder()
+                    .customerId(orderCreationRequest.getUserId())
+                    .totalPrice(calculatedTotalPrice)
+                    .currentStatus(OrderStatus.PENDING)
+                    .build();
+            
+            OrderEntity savedOrder = orderRepository.save(newOrder);
+            
+            List<OrderItemEntity> orderItems = orderMapper.mapToOrderItemEntities(
+                    orderCreationRequest.getItemsList(), savedOrder);
+            
+            savedOrder.setOrderItems(orderItems);
+            orderRepository.save(savedOrder);
+            
+            Order orderProto = orderMapper.toProto(savedOrder);
+            
+            StreamResponseHandler.respond(responseObserver, CreateOrderResponse.newBuilder()
+                    .setResponse(ResponseBuilder.success("Order created successfully"))
+                    .setOrder(orderProto)
+                    .setUser(customerValidation.getUser())
+                    .build());
+                    
+        } catch (Exception e) {
+            log.error("Error creating order", e);
+            StreamResponseHandler.respond(responseObserver, CreateOrderResponse.newBuilder()
+                    .setResponse(ResponseBuilder.error("Failed to create order: " + e.getMessage(), "ORDER_CREATE_ERROR"))
+                    .build());
+        }
+    }
+
+    @Override
+    public void getOrder(GetOrderRequest request, StreamObserver<GetOrderResponse> responseObserver) {
+        log.info("Get order: {}", request.getOrderId());
+        
+        try {
+            Optional<OrderEntity> orderEntityOpt = orderRepository.findById(request.getOrderId());
+            
+            if (orderEntityOpt.isEmpty()) {
+                StreamResponseHandler.respond(responseObserver, GetOrderResponse.newBuilder()
+                        .setResponse(ResponseBuilder.error("Order not found", "ORDER_NOT_FOUND"))
+                        .build());
+                return;
+            }
+            
+            OrderEntity foundOrder = orderEntityOpt.get();
+            GetUserResponse customerResponse = fetchCustomerDetails(foundOrder.getCustomerId());
+            
+            if (!customerResponse.getResponse().getSuccess()) {
+                StreamResponseHandler.respond(responseObserver, GetOrderResponse.newBuilder()
+                        .setResponse(ResponseBuilder.error("Customer not found for order", "CUSTOMER_NOT_FOUND"))
+                        .build());
+                return;
+            }
+            
+            Order orderProto = orderMapper.toProto(foundOrder);
+            
+            StreamResponseHandler.respond(responseObserver, GetOrderResponse.newBuilder()
+                    .setResponse(ResponseBuilder.success("Order found"))
+                    .setOrder(orderProto)
+                    .setUser(customerResponse.getUser())
+                    .build());
+                    
+        } catch (Exception e) {
+            log.error("Error getting order", e);
+            StreamResponseHandler.respond(responseObserver, GetOrderResponse.newBuilder()
+                    .setResponse(ResponseBuilder.error("Failed to get order: " + e.getMessage(), "ORDER_FETCH_ERROR"))
+                    .build());
+        }
+    }
+
+    @Override
+    public void updateOrderStatus(UpdateOrderStatusRequest request, StreamObserver<UpdateOrderStatusResponse> responseObserver) {
+        log.info("Update order status: ID={}, Status={}", request.getOrderId(), request.getStatus());
+        
+        try {
+            Optional<OrderEntity> existingOrderOpt = orderRepository.findById(request.getOrderId());
+            
+            if (existingOrderOpt.isEmpty()) {
+                StreamResponseHandler.respond(responseObserver, UpdateOrderStatusResponse.newBuilder()
+                        .setResponse(ResponseBuilder.error("Order to update not found", "ORDER_NOT_FOUND"))
+                        .build());
+                return;
+            }
+            
+            OrderEntity existingOrder = existingOrderOpt.get();
+            existingOrder.setCurrentStatus(orderMapper.mapToEntityOrderStatus(request.getStatus()));
+            
+            OrderEntity updatedOrder = orderRepository.save(existingOrder);
+            Order orderProto = orderMapper.toProto(updatedOrder);
+            
+            StreamResponseHandler.respond(responseObserver, UpdateOrderStatusResponse.newBuilder()
+                    .setResponse(ResponseBuilder.success("Order status updated successfully"))
+                    .setOrder(orderProto)
+                    .build());
+                    
+        } catch (Exception e) {
+            log.error("Error updating order status", e);
+            StreamResponseHandler.respond(responseObserver, UpdateOrderStatusResponse.newBuilder()
+                    .setResponse(ResponseBuilder.error("Failed to update order status: " + e.getMessage(), "ORDER_UPDATE_ERROR"))
+                    .build());
+        }
+    }
+
+    @Override
+    public void getUserOrders(GetUserOrdersRequest request, StreamObserver<GetUserOrdersResponse> responseObserver) {
+        log.info("Get user orders: {}", request.getUserId());
+        
+        try {
+            ValidateUserResponse customerValidation = validateCustomer(request.getUserId());
+            if (!customerValidation.getIsValid()) {
+                StreamResponseHandler.respond(responseObserver, GetUserOrdersResponse.newBuilder()
+                        .setResponse(ResponseBuilder.error("Invalid customer: " + customerValidation.getErrorMessage(), "INVALID_CUSTOMER"))
+                        .build());
+                return;
+            }
+            
+            List<OrderEntity> customerOrders = orderRepository.findByCustomerId(request.getUserId());
+            List<Order> orderProtos = customerOrders.stream()
+                    .map(orderMapper::toProto)
+                    .toList();
+            
+            StreamResponseHandler.respond(responseObserver, GetUserOrdersResponse.newBuilder()
+                    .setResponse(ResponseBuilder.success("Customer orders found"))
+                    .addAllOrders(orderProtos)
+                    .setUser(customerValidation.getUser())
+                    .build());
+                    
+        } catch (Exception e) {
+            log.error("Error fetching user orders", e);
+            StreamResponseHandler.respond(responseObserver, GetUserOrdersResponse.newBuilder()
+                    .setResponse(ResponseBuilder.error("Failed to fetch user orders: " + e.getMessage(), "ORDER_FETCH_ERROR"))
+                    .build());
+        }
+    }
+
+    @Override
+    public void cancelOrder(CancelOrderRequest request, StreamObserver<CancelOrderResponse> responseObserver) {
+        log.info("Cancel order: {}", request.getOrderId());
+        
+        try {
+            Optional<OrderEntity> existingOrderOpt = orderRepository.findById(request.getOrderId());
+            
+            if (existingOrderOpt.isEmpty()) {
+                StreamResponseHandler.respond(responseObserver, CancelOrderResponse.newBuilder()
+                        .setResponse(ResponseBuilder.error("Order to cancel not found", "ORDER_NOT_FOUND"))
+                        .build());
+                return;
+            }
+            
+            OrderEntity existingOrder = existingOrderOpt.get();
+            
+            if (existingOrder.getCurrentStatus() == OrderStatus.DELIVERED) {
+                StreamResponseHandler.respond(responseObserver, CancelOrderResponse.newBuilder()
+                        .setResponse(ResponseBuilder.error("Cannot cancel delivered order", "ORDER_CANNOT_CANCEL"))
+                        .build());
+                return;
+            }
+            
+            existingOrder.setCurrentStatus(OrderStatus.CANCELLED);
+            OrderEntity cancelledOrder = orderRepository.save(existingOrder);
+            Order orderProto = orderMapper.toProto(cancelledOrder);
+            
+            StreamResponseHandler.respond(responseObserver, CancelOrderResponse.newBuilder()
+                    .setResponse(ResponseBuilder.success("Order cancelled successfully"))
+                    .setOrder(orderProto)
+                    .build());
+                    
+        } catch (Exception e) {
+            log.error("Error cancelling order", e);
+            StreamResponseHandler.respond(responseObserver, CancelOrderResponse.newBuilder()
+                    .setResponse(ResponseBuilder.error("Failed to cancel order: " + e.getMessage(), "ORDER_CANCEL_ERROR"))
+                    .build());
+        }
+    }
+    
+    private ValidateUserResponse validateCustomer(long customerId) {
+        ValidateUserRequest customerValidationRequest = ValidateUserRequest.newBuilder()
+                .setUserId(customerId)
+                .build();
+        return userServiceStub.validateUser(customerValidationRequest);
+    }
+    
+    private GetUserResponse fetchCustomerDetails(long customerId) {
+        GetUserRequest customerDetailsRequest = GetUserRequest.newBuilder()
+                .setUserId(customerId)
+                .build();
+        return userServiceStub.getUser(customerDetailsRequest);
+    }
+    
+}
