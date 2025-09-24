@@ -16,18 +16,18 @@ public class User extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long userId;
 
     @Column(nullable = false, length = 100)
-    private String name;
+    private String fullName;
 
     @Column(nullable = false, unique = true, length = 150)
-    private String email;
+    private String emailAddress;
 
     @Column(nullable = false, length = 20)
-    private String phone;
+    private String phoneNumber;
 
     @Embedded
-    private Address address;
+    private ContactAddress contactAddress;
 
 }

@@ -1,10 +1,10 @@
 package com.example.user.service;
 
-import com.example.common.CommonProto.*;
+import com.example.common.CommonProto;
 import com.example.common.ResponseBuilder;
 import com.example.common.util.StreamResponseHandler;
 import com.example.user.UserProto.*;
-import com.example.user.entity.UserEntity;
+import com.example.user.entity.User;
 import com.example.user.mapper.UserMapper;
 import com.example.user.repository.UserRepository;
 import io.grpc.stub.StreamObserver;
@@ -36,10 +36,10 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
                 return;
             }
             
-            UserEntity newUser = userMapper.mapToUserEntity(createRequest);
+            User newUser = userMapper.mapToUserEntity(createRequest);
             
-            UserEntity savedUser = userRepository.save(newUser);
-            User userProto = userMapper.toProto(savedUser);
+            User savedUser = userRepository.save(newUser);
+            CommonProto.User userProto = userMapper.toProto(savedUser);
             
             StreamResponseHandler.respond(responseObserver, CreateUserResponse.newBuilder()
                     .setResponse(ResponseBuilder.success("User created successfully"))
@@ -59,7 +59,7 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
         log.info("Fetching user: {}", getUserRequest.getUserId());
         
         try {
-            Optional<UserEntity> foundUser = userRepository.findById(getUserRequest.getUserId());
+            Optional<User> foundUser = userRepository.findById(getUserRequest.getUserId());
             
             if (foundUser.isEmpty()) {
                 StreamResponseHandler.respond(responseObserver, GetUserResponse.newBuilder()
@@ -68,7 +68,7 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
                 return;
             }
             
-            User userProto = userMapper.toProto(foundUser.get());
+            CommonProto.User userProto = userMapper.toProto(foundUser.get());
             StreamResponseHandler.respond(responseObserver, GetUserResponse.newBuilder()
                     .setResponse(ResponseBuilder.success("User found"))
                     .setUser(userProto)
@@ -87,7 +87,7 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
         log.info("Updating user: {}", updateRequest.getUserId());
         
         try {
-            Optional<UserEntity> existingUserOpt = userRepository.findById(updateRequest.getUserId());
+            Optional<User> existingUserOpt = userRepository.findById(updateRequest.getUserId());
             
             if (existingUserOpt.isEmpty()) {
                 StreamResponseHandler.respond(responseObserver, UpdateUserResponse.newBuilder()
@@ -96,11 +96,11 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
                 return;
             }
             
-            UserEntity existingUser = existingUserOpt.get();
+            User existingUser = existingUserOpt.get();
             userMapper.updateUserEntity(existingUser, updateRequest);
             
-            UserEntity updatedUser = userRepository.save(existingUser);
-            User userProto = userMapper.toProto(updatedUser);
+            User updatedUser = userRepository.save(existingUser);
+            CommonProto.User userProto = userMapper.toProto(updatedUser);
             
             StreamResponseHandler.respond(responseObserver, UpdateUserResponse.newBuilder()
                     .setResponse(ResponseBuilder.success("User updated successfully"))
@@ -145,7 +145,7 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
         log.info("Validating user: {}", validationRequest.getUserId());
         
         try {
-            Optional<UserEntity> foundUser = userRepository.findById(validationRequest.getUserId());
+            Optional<User> foundUser = userRepository.findById(validationRequest.getUserId());
             
             if (foundUser.isEmpty()) {
                 StreamResponseHandler.respond(responseObserver, ValidateUserResponse.newBuilder()
@@ -155,7 +155,7 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
                 return;
             }
             
-            User userProto = userMapper.toProto(foundUser.get());
+            CommonProto.User userProto = userMapper.toProto(foundUser.get());
             StreamResponseHandler.respond(responseObserver, ValidateUserResponse.newBuilder()
                     .setIsValid(true)
                     .setUser(userProto)

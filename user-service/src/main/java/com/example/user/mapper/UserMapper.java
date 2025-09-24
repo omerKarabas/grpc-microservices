@@ -1,11 +1,11 @@
 package com.example.user.mapper;
 
+import com.example.common.CommonProto;
 import com.example.common.CommonProto.Address;
-import com.example.common.CommonProto.User;
 import com.example.user.UserProto.CreateUserRequest;
 import com.example.user.UserProto.UpdateUserRequest;
 import com.example.user.entity.ContactAddress;
-import com.example.user.entity.UserEntity;
+import com.example.user.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -13,17 +13,17 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class UserMapper {
 
-    public User toProto(UserEntity userEntity) {
-        if (userEntity == null) return null;
+    public CommonProto.User toProto(User user) {
+        if (user == null) return null;
 
-        User.Builder userBuilder = User.newBuilder()
-                .setId(userEntity.getUserId())
-                .setName(userEntity.getFullName())
-                .setEmail(userEntity.getEmailAddress())
-                .setPhone(userEntity.getPhoneNumber());
+        CommonProto.User.Builder userBuilder = CommonProto.User.newBuilder()
+                .setId(user.getUserId())
+                .setName(user.getFullName())
+                .setEmail(user.getEmailAddress())
+                .setPhone(user.getPhoneNumber());
 
-        if (userEntity.getContactAddress() != null) {
-            Address address = mapToAddressProto(userEntity.getContactAddress());
+        if (user.getContactAddress() != null) {
+            Address address = mapToAddressProto(user.getContactAddress());
             userBuilder.setAddress(address);
         }
 
@@ -43,10 +43,10 @@ public class UserMapper {
                 .build();
     }
 
-    public UserEntity mapToUserEntity(CreateUserRequest createRequest) {
+    public User mapToUserEntity(CreateUserRequest createRequest) {
         if (createRequest == null) return null;
 
-        return UserEntity.builder()
+        return User.builder()
                 .fullName(createRequest.getName())
                 .emailAddress(createRequest.getEmail())
                 .phoneNumber(createRequest.getPhone())
@@ -54,7 +54,7 @@ public class UserMapper {
                 .build();
     }
 
-    public void updateUserEntity(UserEntity existingUser, UpdateUserRequest updateRequest) {
+    public void updateUserEntity(User existingUser, UpdateUserRequest updateRequest) {
         if (existingUser == null || updateRequest == null) return;
 
         existingUser.setFullName(updateRequest.getName());
