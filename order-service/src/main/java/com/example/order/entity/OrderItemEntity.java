@@ -30,7 +30,7 @@ public class OrderItemEntity extends BaseEntity {
     @Column(nullable = false, precision = 10, scale = 2, name = "unit_price")
     private Double unitPrice;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "order_id", nullable = false)
     private OrderEntity order;
 

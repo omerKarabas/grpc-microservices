@@ -22,7 +22,7 @@ public class OrderEntity extends BaseEntity {
     @Column(nullable = false, name = "customer_id")
     private Long customerId;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "order", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private List<OrderItemEntity> orderItems;
 
     @Column(nullable = false, precision = 10, scale = 2, name = "total_price")
