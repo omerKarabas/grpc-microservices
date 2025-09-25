@@ -13,7 +13,7 @@ import lombok.*;
 @ToString
 public class ContactAddress {
 
-    @Column(length = 200)
+    @Column(length = 500)
     private String streetAddress;
     
     @Column(nullable = false, length = 100)
@@ -22,7 +22,7 @@ public class ContactAddress {
     @Column(length = 100)
     private String stateName;
     
-    @Column(length = 20)
+    @Column(length = 50)
     private String postalCode;
     
     @Column(nullable = false, length = 100)

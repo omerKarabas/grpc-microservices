@@ -24,7 +24,7 @@ public class User extends BaseEntity {
     @Column(nullable = false, unique = true, length = 150)
     private String emailAddress;
 
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, length = 50)
     private String phoneNumber;
 
     @Embedded
