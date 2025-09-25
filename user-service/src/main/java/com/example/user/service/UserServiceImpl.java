@@ -177,18 +177,12 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
         log.debug("Saving user with ID: {}", user.getUserId());
         return userRepository.save(user);
     }
-    
-    // Helper methods for find operations
+
     private Optional<User> findUserById(Long userId) {
         log.debug("Finding user by ID: {}", userId);
         return userRepository.findById(userId);
     }
-    
-    private Optional<User> findUserByEmail(String email) {
-        log.debug("Finding user by email: {}", email);
-        return userRepository.findByEmailAddress(email);
-    }
-    
+
     private boolean existsUserByEmail(String email) {
         log.debug("Checking if user exists by email: {}", email);
         return userRepository.existsByEmailAddress(email);
