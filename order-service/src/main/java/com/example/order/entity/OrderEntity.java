@@ -25,7 +25,7 @@ public class OrderEntity extends BaseEntity {
     @OneToMany(mappedBy = "order", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private List<OrderItemEntity> orderItems;
 
-    @Column(nullable = false, precision = 10, scale = 2, name = "total_price")
+    @Column(nullable = false, name = "total_price")
     private Double totalPrice;
 
     @Enumerated(EnumType.STRING)
