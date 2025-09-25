@@ -172,7 +172,6 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
         }
     }
     
-    // Helper methods for save operations
     private User saveUser(User user) {
         log.debug("Saving user with ID: {}", user.getUserId());
         return userRepository.save(user);
