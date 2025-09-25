@@ -33,6 +33,12 @@
         <dependency>
             <groupId>net.devh</groupId>
             <artifactId>grpc-server-spring-boot-starter</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.grpc</groupId>
+                    <artifactId>grpc-census</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Common Module -->

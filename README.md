@@ -873,6 +873,45 @@ com.example.common.exception.ResourceNotFoundException: User not found
 2025-09-25 16:01:00 - GlobalExceptionInterceptor mapped to gRPC status: NOT_FOUND
 ```
 
+## 🔧 Troubleshooting
+
+### Census Stats Warning Fix
+
+**Problem**: `Unable to apply census stats` hatası
+
+**Root Cause**: gRPC'nin eski monitoring/tracing özelliklerinin bulunamaması
+
+**Solutions Applied**:
+
+1. **Maven Dependencies** (pom.xml):
+```xml
+<dependency>
+    <groupId>net.devh</groupId>
+    <artifactId>grpc-server-spring-boot-starter</artifactId>
+    <exclusions>
+        <exclusion>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-census</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+```
+
+2. **JVM Arguments** (application.properties):
+```properties
+# Add these to your JVM arguments when running the application:
+# -Dio.grpc.internal.CensusStatsAccessor.disabled=true
+# -Dio.grpc.internal.CensusTracingAccessor.disabled=true
+```
+
+3. **Logging Configuration**:
+```properties
+logging.level.io.grpc=WARN
+logging.level.com.example=DEBUG
+```
+
+**Result**: Census stats warning'leri tamamen kaldırıldı. Bu özellik zararsızdır ve uygulamanın çalışmasını etkilemez.
+
 **Benefits Achieved**:
 - **Reduced Code Duplication**: ~60% less boilerplate code
 - **Consistent Error Handling**: Standardized error responses using enum constants and messages

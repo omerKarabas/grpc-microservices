@@ -344,3 +344,245 @@ java.lang.ClassNotFoundException: io.grpc.census.InternalCensusTracingAccessor
 2025-09-25T16:05:18.870+03:00 DEBUG 146440 --- [user-service] [grpc-default-boss-ELG-1-1] i.g.n.s.io.netty.buffer.ByteBufUtil      : -Dio.netty.maxThreadLocalCharBufferSize: 16384
 2025-09-25T16:05:18.875+03:00  INFO 146440 --- [user-service] [main] n.d.b.g.s.s.GrpcServerLifecycle          : gRPC Server started, listening on address: 0.0.0.0, port: 9090
 2025-09-25T16:05:18.878+03:00  INFO 146440 --- [user-service] [main] c.example.user.UserServiceApplication    : Started UserServiceApplication in 1.852 seconds (process running for 2.004)
+2025-09-25T16:07:33.177+03:00  INFO 146440 --- [user-service] [SpringApplicationShutdownHook] n.d.b.g.s.s.GrpcServerLifecycle          : Completed gRPC server shutdown
+2025-09-25T16:07:33.180+03:00  INFO 146440 --- [user-service] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-09-25T16:07:33.181+03:00 DEBUG 146440 --- [user-service] [SpringApplicationShutdownHook] org.hibernate.SQL                        : 
+    drop table if exists users cascade 
+2025-09-25T16:07:33.186+03:00  INFO 146440 --- [user-service] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-09-25T16:07:33.191+03:00  INFO 146440 --- [user-service] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-09-25T16:09:31.826+03:00  INFO 148588 --- [user-service] [main] c.example.user.UserServiceApplication    : Starting UserServiceApplication using Java 21.0.8 with PID 148588 (/home/omerkarabas/development/grpc-microservices/user-service/target/classes started by omerkarabas in /home/omerkarabas/development/grpc-microservices/user-service)
+2025-09-25T16:09:31.826+03:00 DEBUG 148588 --- [user-service] [main] c.example.user.UserServiceApplication    : Running with Spring Boot v3.5.6, Spring v6.2.11
+2025-09-25T16:09:31.827+03:00  INFO 148588 --- [user-service] [main] c.example.user.UserServiceApplication    : No active profile set, falling back to 1 default profile: "default"
+2025-09-25T16:09:32.069+03:00  INFO 148588 --- [user-service] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-09-25T16:09:32.111+03:00  INFO 148588 --- [user-service] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 38 ms. Found 1 JPA repository interface.
+2025-09-25T16:09:32.324+03:00  INFO 148588 --- [user-service] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-09-25T16:09:32.342+03:00  INFO 148588 --- [user-service] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.29.Final
+2025-09-25T16:09:32.358+03:00  INFO 148588 --- [user-service] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-09-25T16:09:32.506+03:00  INFO 148588 --- [user-service] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-09-25T16:09:32.520+03:00  INFO 148588 --- [user-service] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-09-25T16:09:32.620+03:00  INFO 148588 --- [user-service] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:usersdb user=SA
+2025-09-25T16:09:32.621+03:00  INFO 148588 --- [user-service] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-09-25T16:09:32.631+03:00  WARN 148588 --- [user-service] [main] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-09-25T16:09:32.642+03:00  INFO 148588 --- [user-service] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 2.2.224
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-09-25T16:09:33.039+03:00  INFO 148588 --- [user-service] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-09-25T16:09:33.045+03:00 DEBUG 148588 --- [user-service] [main] org.hibernate.SQL                        : 
+    drop table if exists users cascade 
+2025-09-25T16:09:33.049+03:00 DEBUG 148588 --- [user-service] [main] org.hibernate.SQL                        : 
+    create table users (
+        created_at timestamp(6) not null,
+        updated_at timestamp(6),
+        user_id bigint generated by default as identity,
+        version bigint,
+        phone_number varchar(50) not null,
+        postal_code varchar(50),
+        city_name varchar(100) not null,
+        country_name varchar(100) not null,
+        full_name varchar(100) not null,
+        state_name varchar(100),
+        email_address varchar(150) not null unique,
+        street_address varchar(500),
+        primary key (user_id)
+    )
+2025-09-25T16:09:33.057+03:00  INFO 148588 --- [user-service] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-09-25T16:09:33.194+03:00  INFO 148588 --- [user-service] [main] c.e.c.c.GrpcExceptionHandlingConfig      : GlobalExceptionInterceptor is configured and ready to handle exceptions
+2025-09-25T16:09:33.220+03:00  INFO 148588 --- [user-service] [main] g.s.a.GrpcServerFactoryAutoConfiguration : Detected grpc-netty-shaded: Creating ShadedNettyGrpcServerFactory
+2025-09-25T16:09:33.330+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.u.i.l.InternalLoggerFactory  : Using SLF4J as the default logging framework
+2025-09-25T16:09:33.331+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.u.i.PlatformDependent0       : -Dio.netty.noUnsafe: false
+2025-09-25T16:09:33.332+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.u.i.PlatformDependent0       : Java version: 21
+2025-09-25T16:09:33.332+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.u.i.PlatformDependent0       : sun.misc.Unsafe.theUnsafe: available
+2025-09-25T16:09:33.333+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.u.i.PlatformDependent0       : sun.misc.Unsafe.copyMemory: available
+2025-09-25T16:09:33.333+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.u.i.PlatformDependent0       : sun.misc.Unsafe.storeFence: available
+2025-09-25T16:09:33.333+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.u.i.PlatformDependent0       : java.nio.Buffer.address: available
+2025-09-25T16:09:33.333+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.u.i.PlatformDependent0       : direct buffer constructor: unavailable: Reflective setAccessible(true) disabled
+2025-09-25T16:09:33.333+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.u.i.PlatformDependent0       : java.nio.Bits.unaligned: available, true
+2025-09-25T16:09:33.334+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.u.i.PlatformDependent0       : jdk.internal.misc.Unsafe.allocateUninitializedArray(int): unavailable: class io.grpc.netty.shaded.io.netty.util.internal.PlatformDependent0$7 cannot access class jdk.internal.misc.Unsafe (in module java.base) because module java.base does not export jdk.internal.misc to unnamed module @727803de
+2025-09-25T16:09:33.334+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.u.i.PlatformDependent0       : java.nio.DirectByteBuffer.<init>(long, {int,long}): unavailable
+2025-09-25T16:09:33.334+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.u.i.PlatformDependent        : sun.misc.Unsafe: available
+2025-09-25T16:09:33.339+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.u.i.PlatformDependent        : maxDirectMemory: 10435428352 bytes (maybe)
+2025-09-25T16:09:33.339+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.u.i.PlatformDependent        : -Dio.netty.tmpdir: /tmp (java.io.tmpdir)
+2025-09-25T16:09:33.339+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.u.i.PlatformDependent        : -Dio.netty.bitMode: 64 (sun.arch.data.model)
+2025-09-25T16:09:33.340+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.u.i.PlatformDependent        : -Dio.netty.maxDirectMemory: -1 bytes
+2025-09-25T16:09:33.340+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.u.i.PlatformDependent        : -Dio.netty.uninitializedArrayAllocationThreshold: -1
+2025-09-25T16:09:33.341+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.util.internal.CleanerJava9   : java.nio.ByteBuffer.cleaner(): available
+2025-09-25T16:09:33.341+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.u.i.PlatformDependent        : -Dio.netty.noPreferDirect: false
+2025-09-25T16:09:33.360+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.u.i.NativeLibraryLoader      : -Dio.netty.native.workdir: /tmp (io.netty.tmpdir)
+2025-09-25T16:09:33.360+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.u.i.NativeLibraryLoader      : -Dio.netty.native.deleteLibAfterLoading: true
+2025-09-25T16:09:33.360+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.u.i.NativeLibraryLoader      : -Dio.netty.native.tryPatchShadedId: true
+2025-09-25T16:09:33.360+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.u.i.NativeLibraryLoader      : -Dio.netty.native.detectNativeLibraryDuplicates: true
+2025-09-25T16:09:33.365+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.u.i.NativeLibraryLoader      : Successfully loaded the library /tmp/libio_grpc_netty_shaded_netty_transport_native_epoll_x86_6412373871166585857638.so
+2025-09-25T16:09:33.367+03:00 DEBUG 148588 --- [user-service] [main] i.g.netty.shaded.io.netty.util.NetUtil   : -Djava.net.preferIPv4Stack: false
+2025-09-25T16:09:33.367+03:00 DEBUG 148588 --- [user-service] [main] i.g.netty.shaded.io.netty.util.NetUtil   : -Djava.net.preferIPv6Addresses: false
+2025-09-25T16:09:33.368+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.util.NetUtilInitializations  : Loopback interface: lo (lo, 0:0:0:0:0:0:0:1%lo)
+2025-09-25T16:09:33.369+03:00 DEBUG 148588 --- [user-service] [main] i.g.netty.shaded.io.netty.util.NetUtil   : /proc/sys/net/core/somaxconn: 4096
+2025-09-25T16:09:33.379+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.c.MultithreadEventLoopGroup  : -Dio.netty.eventLoopThreads: 24
+2025-09-25T16:09:33.384+03:00  INFO 148588 --- [user-service] [main] n.d.b.g.s.s.AbstractGrpcServerFactory    : Registered gRPC service: com.example.user.UserService, bean: userServiceImpl, class: com.example.user.service.UserServiceImpl
+2025-09-25T16:09:33.384+03:00  INFO 148588 --- [user-service] [main] n.d.b.g.s.s.AbstractGrpcServerFactory    : Registered gRPC service: grpc.health.v1.Health, bean: grpcHealthService, class: io.grpc.protobuf.services.HealthServiceImpl
+2025-09-25T16:09:33.384+03:00  INFO 148588 --- [user-service] [main] n.d.b.g.s.s.AbstractGrpcServerFactory    : Registered gRPC service: grpc.reflection.v1alpha.ServerReflection, bean: protoReflectionService, class: io.grpc.protobuf.services.ProtoReflectionService
+2025-09-25T16:09:33.384+03:00  INFO 148588 --- [user-service] [main] c.example.user.UserServiceApplication    : GlobalExceptionInterceptor registered successfully
+2025-09-25T16:09:33.386+03:00 DEBUG 148588 --- [user-service] [main] io.grpc.internal.ServerImplBuilder       : Unable to apply census stats
+
+java.lang.ClassNotFoundException: io.grpc.census.InternalCensusStatsAccessor
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641) ~[na:na]
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188) ~[na:na]
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:526) ~[na:na]
+	at java.base/java.lang.Class.forName0(Native Method) ~[na:na]
+	at java.base/java.lang.Class.forName(Class.java:421) ~[na:na]
+	at java.base/java.lang.Class.forName(Class.java:412) ~[na:na]
+	at io.grpc.internal.ServerImplBuilder.getTracerFactories(ServerImplBuilder.java:264) ~[grpc-core-1.58.0.jar:1.58.0]
+	at io.grpc.internal.ServerImplBuilder.build(ServerImplBuilder.java:243) ~[grpc-core-1.58.0.jar:1.58.0]
+	at io.grpc.internal.AbstractServerImplBuilder.build(AbstractServerImplBuilder.java:217) ~[grpc-core-1.58.0.jar:1.58.0]
+	at net.devh.boot.grpc.server.serverfactory.AbstractGrpcServerFactory.createServer(AbstractGrpcServerFactory.java:68) ~[grpc-server-spring-boot-autoconfigure-2.15.0.RELEASE.jar:2.15.0.RELEASE]
+	at net.devh.boot.grpc.server.serverfactory.GrpcServerLifecycle.createAndStartGrpcServer(GrpcServerLifecycle.java:111) ~[grpc-server-spring-boot-autoconfigure-2.15.0.RELEASE.jar:2.15.0.RELEASE]
+	at net.devh.boot.grpc.server.serverfactory.GrpcServerLifecycle.start(GrpcServerLifecycle.java:72) ~[grpc-server-spring-boot-autoconfigure-2.15.0.RELEASE.jar:2.15.0.RELEASE]
+	at org.springframework.context.support.DefaultLifecycleProcessor.doStart(DefaultLifecycleProcessor.java:405) ~[spring-context-6.2.11.jar:6.2.11]
+	at org.springframework.context.support.DefaultLifecycleProcessor.doStart(DefaultLifecycleProcessor.java:394) ~[spring-context-6.2.11.jar:6.2.11]
+	at org.springframework.context.support.DefaultLifecycleProcessor$LifecycleGroup.start(DefaultLifecycleProcessor.java:586) ~[spring-context-6.2.11.jar:6.2.11]
+	at java.base/java.lang.Iterable.forEach(Iterable.java:75) ~[na:na]
+	at org.springframework.context.support.DefaultLifecycleProcessor.startBeans(DefaultLifecycleProcessor.java:364) ~[spring-context-6.2.11.jar:6.2.11]
+	at org.springframework.context.support.DefaultLifecycleProcessor.onRefresh(DefaultLifecycleProcessor.java:310) ~[spring-context-6.2.11.jar:6.2.11]
+	at org.springframework.context.support.AbstractApplicationContext.finishRefresh(AbstractApplicationContext.java:1006) ~[spring-context-6.2.11.jar:6.2.11]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:630) ~[spring-context-6.2.11.jar:6.2.11]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752) ~[spring-boot-3.5.6.jar:3.5.6]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439) ~[spring-boot-3.5.6.jar:3.5.6]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318) ~[spring-boot-3.5.6.jar:3.5.6]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361) ~[spring-boot-3.5.6.jar:3.5.6]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350) ~[spring-boot-3.5.6.jar:3.5.6]
+	at com.example.user.UserServiceApplication.main(UserServiceApplication.java:19) ~[classes/:na]
+
+2025-09-25T16:09:33.388+03:00 DEBUG 148588 --- [user-service] [main] io.grpc.internal.ServerImplBuilder       : Unable to apply census stats
+
+java.lang.ClassNotFoundException: io.grpc.census.InternalCensusTracingAccessor
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641) ~[na:na]
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188) ~[na:na]
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:526) ~[na:na]
+	at java.base/java.lang.Class.forName0(Native Method) ~[na:na]
+	at java.base/java.lang.Class.forName(Class.java:421) ~[na:na]
+	at java.base/java.lang.Class.forName(Class.java:412) ~[na:na]
+	at io.grpc.internal.ServerImplBuilder.getTracerFactories(ServerImplBuilder.java:296) ~[grpc-core-1.58.0.jar:1.58.0]
+	at io.grpc.internal.ServerImplBuilder.build(ServerImplBuilder.java:243) ~[grpc-core-1.58.0.jar:1.58.0]
+	at io.grpc.internal.AbstractServerImplBuilder.build(AbstractServerImplBuilder.java:217) ~[grpc-core-1.58.0.jar:1.58.0]
+	at net.devh.boot.grpc.server.serverfactory.AbstractGrpcServerFactory.createServer(AbstractGrpcServerFactory.java:68) ~[grpc-server-spring-boot-autoconfigure-2.15.0.RELEASE.jar:2.15.0.RELEASE]
+	at net.devh.boot.grpc.server.serverfactory.GrpcServerLifecycle.createAndStartGrpcServer(GrpcServerLifecycle.java:111) ~[grpc-server-spring-boot-autoconfigure-2.15.0.RELEASE.jar:2.15.0.RELEASE]
+	at net.devh.boot.grpc.server.serverfactory.GrpcServerLifecycle.start(GrpcServerLifecycle.java:72) ~[grpc-server-spring-boot-autoconfigure-2.15.0.RELEASE.jar:2.15.0.RELEASE]
+	at org.springframework.context.support.DefaultLifecycleProcessor.doStart(DefaultLifecycleProcessor.java:405) ~[spring-context-6.2.11.jar:6.2.11]
+	at org.springframework.context.support.DefaultLifecycleProcessor.doStart(DefaultLifecycleProcessor.java:394) ~[spring-context-6.2.11.jar:6.2.11]
+	at org.springframework.context.support.DefaultLifecycleProcessor$LifecycleGroup.start(DefaultLifecycleProcessor.java:586) ~[spring-context-6.2.11.jar:6.2.11]
+	at java.base/java.lang.Iterable.forEach(Iterable.java:75) ~[na:na]
+	at org.springframework.context.support.DefaultLifecycleProcessor.startBeans(DefaultLifecycleProcessor.java:364) ~[spring-context-6.2.11.jar:6.2.11]
+	at org.springframework.context.support.DefaultLifecycleProcessor.onRefresh(DefaultLifecycleProcessor.java:310) ~[spring-context-6.2.11.jar:6.2.11]
+	at org.springframework.context.support.AbstractApplicationContext.finishRefresh(AbstractApplicationContext.java:1006) ~[spring-context-6.2.11.jar:6.2.11]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:630) ~[spring-context-6.2.11.jar:6.2.11]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752) ~[spring-boot-3.5.6.jar:3.5.6]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439) ~[spring-boot-3.5.6.jar:3.5.6]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318) ~[spring-boot-3.5.6.jar:3.5.6]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361) ~[spring-boot-3.5.6.jar:3.5.6]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350) ~[spring-boot-3.5.6.jar:3.5.6]
+	at com.example.user.UserServiceApplication.main(UserServiceApplication.java:19) ~[classes/:na]
+
+2025-09-25T16:09:33.395+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.u.c.GlobalEventExecutor      : -Dio.netty.globalEventExecutor.quietPeriodSeconds: 1
+2025-09-25T16:09:33.399+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.u.i.InternalThreadLocalMap   : -Dio.netty.threadLocalMap.stringBuilder.initialSize: 1024
+2025-09-25T16:09:33.399+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.u.i.InternalThreadLocalMap   : -Dio.netty.threadLocalMap.stringBuilder.maxSize: 4096
+2025-09-25T16:09:33.404+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.u.i.PlatformDependent        : org.jctools-core.MpscChunkedArrayQueue: available
+2025-09-25T16:09:33.416+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.util.ResourceLeakDetector    : -Dio.grpc.netty.shaded.io.netty.leakDetection.level: simple
+2025-09-25T16:09:33.416+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.util.ResourceLeakDetector    : -Dio.grpc.netty.shaded.io.netty.leakDetection.targetRecords: 4
+2025-09-25T16:09:33.417+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.b.PooledByteBufAllocator     : -Dio.netty.allocator.numHeapArenas: 24
+2025-09-25T16:09:33.418+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.b.PooledByteBufAllocator     : -Dio.netty.allocator.numDirectArenas: 24
+2025-09-25T16:09:33.418+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.b.PooledByteBufAllocator     : -Dio.netty.allocator.pageSize: 8192
+2025-09-25T16:09:33.418+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.b.PooledByteBufAllocator     : -Dio.netty.allocator.maxOrder: 9
+2025-09-25T16:09:33.418+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.b.PooledByteBufAllocator     : -Dio.netty.allocator.chunkSize: 4194304
+2025-09-25T16:09:33.418+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.b.PooledByteBufAllocator     : -Dio.netty.allocator.smallCacheSize: 256
+2025-09-25T16:09:33.418+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.b.PooledByteBufAllocator     : -Dio.netty.allocator.normalCacheSize: 64
+2025-09-25T16:09:33.418+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.b.PooledByteBufAllocator     : -Dio.netty.allocator.maxCachedBufferCapacity: 32768
+2025-09-25T16:09:33.418+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.b.PooledByteBufAllocator     : -Dio.netty.allocator.cacheTrimInterval: 8192
+2025-09-25T16:09:33.418+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.b.PooledByteBufAllocator     : -Dio.netty.allocator.cacheTrimIntervalMillis: 0
+2025-09-25T16:09:33.418+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.b.PooledByteBufAllocator     : -Dio.netty.allocator.useCacheForAllThreads: false
+2025-09-25T16:09:33.418+03:00 DEBUG 148588 --- [user-service] [main] i.g.n.s.i.n.b.PooledByteBufAllocator     : -Dio.netty.allocator.maxCachedByteBuffersPerChunk: 1023
+2025-09-25T16:09:33.422+03:00 DEBUG 148588 --- [user-service] [main] i.grpc.netty.shaded.io.grpc.netty.Utils  : Using custom allocator: forceHeapBuffer=false, defaultPreferDirect=true
+2025-09-25T16:09:33.422+03:00 DEBUG 148588 --- [user-service] [main] i.grpc.netty.shaded.io.grpc.netty.Utils  : Creating allocator, preferDirect=true
+2025-09-25T16:09:33.423+03:00 DEBUG 148588 --- [user-service] [main] i.grpc.netty.shaded.io.grpc.netty.Utils  : Forcing maxOrder=8
+2025-09-25T16:09:33.423+03:00 DEBUG 148588 --- [user-service] [main] i.grpc.netty.shaded.io.grpc.netty.Utils  : Using custom allocator: forceHeapBuffer=false, defaultPreferDirect=true
+2025-09-25T16:09:33.428+03:00 DEBUG 148588 --- [user-service] [grpc-default-boss-ELG-1-1] i.g.n.s.i.n.channel.DefaultChannelId     : -Dio.netty.processId: 148588 (auto-detected)
+2025-09-25T16:09:33.429+03:00 DEBUG 148588 --- [user-service] [grpc-default-boss-ELG-1-1] i.g.n.s.i.n.channel.DefaultChannelId     : -Dio.netty.machineId: 38:7a:0e:ff:fe:8f:75:87 (auto-detected)
+2025-09-25T16:09:33.436+03:00 DEBUG 148588 --- [user-service] [grpc-default-boss-ELG-1-1] i.g.n.s.io.netty.buffer.ByteBufUtil      : -Dio.netty.allocator.type: pooled
+2025-09-25T16:09:33.436+03:00 DEBUG 148588 --- [user-service] [grpc-default-boss-ELG-1-1] i.g.n.s.io.netty.buffer.ByteBufUtil      : -Dio.netty.threadLocalDirectBufferSize: 0
+2025-09-25T16:09:33.437+03:00 DEBUG 148588 --- [user-service] [grpc-default-boss-ELG-1-1] i.g.n.s.io.netty.buffer.ByteBufUtil      : -Dio.netty.maxThreadLocalCharBufferSize: 16384
+2025-09-25T16:09:33.441+03:00  INFO 148588 --- [user-service] [main] n.d.b.g.s.s.GrpcServerLifecycle          : gRPC Server started, listening on address: 0.0.0.0, port: 9090
+2025-09-25T16:09:33.445+03:00  INFO 148588 --- [user-service] [main] c.example.user.UserServiceApplication    : Started UserServiceApplication in 1.826 seconds (process running for 1.979)
+2025-09-25T16:09:49.572+03:00 DEBUG 148588 --- [user-service] [grpc-default-worker-ELG-3-1] i.g.n.s.io.netty.buffer.AbstractByteBuf  : -Dio.grpc.netty.shaded.io.netty.buffer.checkAccessible: true
+2025-09-25T16:09:49.572+03:00 DEBUG 148588 --- [user-service] [grpc-default-worker-ELG-3-1] i.g.n.s.io.netty.buffer.AbstractByteBuf  : -Dio.grpc.netty.shaded.io.netty.buffer.checkBounds: true
+2025-09-25T16:09:49.573+03:00 DEBUG 148588 --- [user-service] [grpc-default-worker-ELG-3-1] .g.n.s.i.n.u.ResourceLeakDetectorFactory : Loaded default ResourceLeakDetector: io.grpc.netty.shaded.io.netty.util.ResourceLeakDetector@2d29da2e
+2025-09-25T16:09:49.605+03:00 DEBUG 148588 --- [user-service] [grpc-default-worker-ELG-3-1] i.g.n.s.i.grpc.netty.NettyServerHandler  : [id: 0x1fd00538, L:/127.0.0.1:9090 - R:/127.0.0.1:46896] OUTBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+2025-09-25T16:09:49.606+03:00 DEBUG 148588 --- [user-service] [grpc-default-worker-ELG-3-1] i.g.netty.shaded.io.netty.util.Recycler  : -Dio.netty.recycler.maxCapacityPerThread: 4096
+2025-09-25T16:09:49.606+03:00 DEBUG 148588 --- [user-service] [grpc-default-worker-ELG-3-1] i.g.netty.shaded.io.netty.util.Recycler  : -Dio.netty.recycler.ratio: 8
+2025-09-25T16:09:49.606+03:00 DEBUG 148588 --- [user-service] [grpc-default-worker-ELG-3-1] i.g.netty.shaded.io.netty.util.Recycler  : -Dio.netty.recycler.chunkSize: 32
+2025-09-25T16:09:49.607+03:00 DEBUG 148588 --- [user-service] [grpc-default-worker-ELG-3-1] i.g.netty.shaded.io.netty.util.Recycler  : -Dio.netty.recycler.blocking: false
+2025-09-25T16:09:49.607+03:00 DEBUG 148588 --- [user-service] [grpc-default-worker-ELG-3-1] i.g.netty.shaded.io.netty.util.Recycler  : -Dio.netty.recycler.batchFastThreadLocalOnly: true
+2025-09-25T16:09:49.611+03:00 DEBUG 148588 --- [user-service] [grpc-default-worker-ELG-3-1] i.g.n.s.i.grpc.netty.NettyServerHandler  : [id: 0x1fd00538, L:/127.0.0.1:9090 - R:/127.0.0.1:46896] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+2025-09-25T16:09:49.618+03:00 DEBUG 148588 --- [user-service] [grpc-default-worker-ELG-3-1] i.g.n.s.i.grpc.netty.NettyServerHandler  : [id: 0x1fd00538, L:/127.0.0.1:9090 - R:/127.0.0.1:46896] INBOUND SETTINGS: ack=false settings=[id: 0x1fd00538, L:/127.0.0.1:9090 - R:/127.0.0.1:46896]
+2025-09-25T16:09:49.619+03:00 DEBUG 148588 --- [user-service] [grpc-default-worker-ELG-3-1] i.g.n.s.i.grpc.netty.NettyServerHandler  : [id: 0x1fd00538, L:/127.0.0.1:9090 - R:/127.0.0.1:46896] OUTBOUND SETTINGS: ack=true
+2025-09-25T16:09:49.626+03:00 DEBUG 148588 --- [user-service] [grpc-default-worker-ELG-3-1] i.g.n.s.i.grpc.netty.NettyServerHandler  : [id: 0x1fd00538, L:/127.0.0.1:9090 - R:/127.0.0.1:46896] INBOUND HEADERS: streamId=1 headers=GrpcHttp2RequestHeaders[:path: /com.example.user.UserService/DeleteUser, :authority: localhost:9090, :method: POST, :scheme: http, te: trailers, grpc-accept-encoding: identity,deflate,gzip, accept-encoding: identity, content-type: application/grpc, user-agent: grpc-node-js/1.11.0-postman.1] padding=0 endStream=false
+2025-09-25T16:09:49.640+03:00 DEBUG 148588 --- [user-service] [grpc-default-worker-ELG-3-1] i.g.n.s.i.grpc.netty.NettyServerHandler  : [id: 0x1fd00538, L:/127.0.0.1:9090 - R:/127.0.0.1:46896] INBOUND DATA: streamId=1 padding=0 endStream=false length=9 bytes=000000000408cead01
+2025-09-25T16:09:49.640+03:00 DEBUG 148588 --- [user-service] [grpc-default-worker-ELG-3-1] i.g.n.s.i.grpc.netty.NettyServerHandler  : [id: 0x1fd00538, L:/127.0.0.1:9090 - R:/127.0.0.1:46896] OUTBOUND PING: ack=false bytes=1234
+2025-09-25T16:09:49.640+03:00 DEBUG 148588 --- [user-service] [grpc-default-executor-0] io.grpc.Context                          : Storage override doesn't exist. Using default
+
+java.lang.ClassNotFoundException: io.grpc.override.ContextStorageOverride
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641) ~[na:na]
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188) ~[na:na]
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:526) ~[na:na]
+	at java.base/java.lang.Class.forName0(Native Method) ~[na:na]
+	at java.base/java.lang.Class.forName(Class.java:421) ~[na:na]
+	at java.base/java.lang.Class.forName(Class.java:412) ~[na:na]
+	at io.grpc.Context$LazyStorage.createStorage(Context.java:129) ~[grpc-api-1.58.0.jar:1.58.0]
+	at io.grpc.Context$LazyStorage.<clinit>(Context.java:118) ~[grpc-api-1.58.0.jar:1.58.0]
+	at io.grpc.Context.storage(Context.java:106) ~[grpc-api-1.58.0.jar:1.58.0]
+	at io.grpc.Context.attach(Context.java:427) ~[grpc-api-1.58.0.jar:1.58.0]
+	at io.grpc.Context$CancellableContext.attach(Context.java:714) ~[grpc-api-1.58.0.jar:1.58.0]
+	at io.grpc.internal.ContextRunnable.run(ContextRunnable.java:35) ~[grpc-core-1.58.0.jar:1.58.0]
+	at io.grpc.internal.SerializingExecutor.run(SerializingExecutor.java:133) ~[grpc-core-1.58.0.jar:1.58.0]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642) ~[na:na]
+	at java.base/java.lang.Thread.run(Thread.java:1583) ~[na:na]
+
+2025-09-25T16:09:49.640+03:00 DEBUG 148588 --- [user-service] [grpc-default-worker-ELG-3-1] i.g.n.s.i.grpc.netty.NettyServerHandler  : [id: 0x1fd00538, L:/127.0.0.1:9090 - R:/127.0.0.1:46896] INBOUND DATA: streamId=1 padding=0 endStream=true length=0 bytes=
+2025-09-25T16:09:49.641+03:00 DEBUG 148588 --- [user-service] [grpc-default-worker-ELG-3-1] i.g.n.s.i.grpc.netty.NettyServerHandler  : [id: 0x1fd00538, L:/127.0.0.1:9090 - R:/127.0.0.1:46896] INBOUND SETTINGS: ack=true
+2025-09-25T16:09:49.642+03:00 DEBUG 148588 --- [user-service] [grpc-default-worker-ELG-3-1] i.g.n.s.i.grpc.netty.NettyServerHandler  : [id: 0x1fd00538, L:/127.0.0.1:9090 - R:/127.0.0.1:46896] INBOUND PING: ack=true bytes=1234
+2025-09-25T16:09:49.643+03:00 DEBUG 148588 --- [user-service] [grpc-default-worker-ELG-3-1] i.g.n.s.i.grpc.netty.NettyServerHandler  : Window: 1,048,576
+2025-09-25T16:09:49.660+03:00  INFO 148588 --- [user-service] [grpc-default-executor-0] c.example.user.service.UserServiceImpl   : Deleting user: 22222
+2025-09-25T16:09:49.660+03:00 DEBUG 148588 --- [user-service] [grpc-default-executor-0] c.example.user.service.UserServiceImpl   : Checking if user exists by ID: 22222
+2025-09-25T16:09:49.904+03:00 DEBUG 148588 --- [user-service] [grpc-default-executor-0] org.hibernate.SQL                        : 
+    select
+        count(*) 
+    from
+        users u1_0 
+    where
+        u1_0.user_id=?
+2025-09-25T16:09:49.927+03:00 ERROR 148588 --- [user-service] [grpc-default-executor-0] c.e.c.i.GlobalExceptionInterceptor       : Exception in gRPC call
+
+com.example.common.exception.ResourceNotFoundException: User with ID '22222' not found
+	at com.example.user.service.UserServiceImpl.deleteUser(UserServiceImpl.java:114) ~[classes/:na]
+	at com.example.user.UserServiceGrpc$MethodHandlers.invoke(UserServiceGrpc.java:548) ~[common-1.0.0-SNAPSHOT.jar:na]
+	at io.grpc.stub.ServerCalls$UnaryServerCallHandler$UnaryServerCallListener.onHalfClose(ServerCalls.java:182) ~[grpc-stub-1.58.0.jar:1.58.0]
+	at io.grpc.PartialForwardingServerCallListener.onHalfClose(PartialForwardingServerCallListener.java:35) ~[grpc-api-1.58.0.jar:1.58.0]
+	at io.grpc.ForwardingServerCallListener.onHalfClose(ForwardingServerCallListener.java:23) ~[grpc-api-1.58.0.jar:1.58.0]
+	at io.grpc.ForwardingServerCallListener$SimpleForwardingServerCallListener.onHalfClose(ForwardingServerCallListener.java:40) ~[grpc-api-1.58.0.jar:1.58.0]
+	at io.grpc.Contexts$ContextualizedServerCallListener.onHalfClose(Contexts.java:86) ~[grpc-api-1.58.0.jar:1.58.0]
+	at io.grpc.PartialForwardingServerCallListener.onHalfClose(PartialForwardingServerCallListener.java:35) ~[grpc-api-1.58.0.jar:1.58.0]
+	at io.grpc.ForwardingServerCallListener.onHalfClose(ForwardingServerCallListener.java:23) ~[grpc-api-1.58.0.jar:1.58.0]
+	at io.grpc.ForwardingServerCallListener$SimpleForwardingServerCallListener.onHalfClose(ForwardingServerCallListener.java:40) ~[grpc-api-1.58.0.jar:1.58.0]
+	at com.example.common.interceptors.GlobalExceptionInterceptor$ExceptionHandlingListener.onHalfClose(GlobalExceptionInterceptor.java:57) ~[common-1.0.0-SNAPSHOT.jar:na]
+	at io.grpc.internal.ServerCallImpl$ServerStreamListenerImpl.halfClosed(ServerCallImpl.java:351) ~[grpc-core-1.58.0.jar:1.58.0]
+	at io.grpc.internal.ServerImpl$JumpToApplicationThreadServerStreamListener$1HalfClosed.runInContext(ServerImpl.java:860) ~[grpc-core-1.58.0.jar:1.58.0]
+	at io.grpc.internal.ContextRunnable.run(ContextRunnable.java:37) ~[grpc-core-1.58.0.jar:1.58.0]
+	at io.grpc.internal.SerializingExecutor.run(SerializingExecutor.java:133) ~[grpc-core-1.58.0.jar:1.58.0]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642) ~[na:na]
+	at java.base/java.lang.Thread.run(Thread.java:1583) ~[na:na]
+
+2025-09-25T16:09:49.930+03:00 DEBUG 148588 --- [user-service] [grpc-default-worker-ELG-3-1] i.g.n.s.i.grpc.netty.NettyServerHandler  : [id: 0x1fd00538, L:/127.0.0.1:9090 - R:/127.0.0.1:46896] OUTBOUND HEADERS: streamId=1 headers=GrpcHttp2OutboundHeaders[:status: 200, content-type: application/grpc, grpc-accept-encoding: identity,deflate,gzip, accept-encoding: identity, grpc-status: 5, grpc-message: User to delete not found] padding=0 endStream=true
