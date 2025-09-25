@@ -2,10 +2,9 @@ package com.example.user.service;
 
 import com.example.common.CommonProto;
 import com.example.common.ResponseBuilder;
-import com.example.common.constants.SpecialChars;
-import com.example.common.util.StreamResponseHandler;
+import com.example.common.exception.DuplicateResourceException;
+import com.example.common.exception.ResourceNotFoundException;
 import com.example.user.UserProto.*;
-import com.example.user.constants.UserErrorCode;
 import com.example.user.entity.User;
 import com.example.user.mapper.UserMapper;
 import com.example.user.repository.UserRepository;
@@ -29,147 +28,127 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
     @Override
     public void createUser(CreateUserRequest createRequest, StreamObserver<CreateUserResponse> responseObserver) {
         log.info("Creating user: {}", createRequest.getEmail());
-        
-        try {
-            if (existsUserByEmail(createRequest.getEmail())) {
-                StreamResponseHandler.respond(responseObserver, CreateUserResponse.newBuilder()
-                        .setResponse(ResponseBuilder.error(UserErrorCode.USER_ALREADY_EXISTS.getMessage(), UserErrorCode.USER_ALREADY_EXISTS.getCode()))
-                        .build());
-                return;
-            }
-            
-            User newUser = userMapper.mapToUserEntity(createRequest);
-            
-            User savedUser = saveUser(newUser);
-            CommonProto.User userProto = userMapper.toProto(savedUser);
-            
-            StreamResponseHandler.respond(responseObserver, CreateUserResponse.newBuilder()
-                    .setResponse(ResponseBuilder.success("User created successfully"))
-                    .setUser(userProto)
-                    .build());
-                    
-        } catch (Exception e) {
-            log.error("Error creating user", e);
-            StreamResponseHandler.respond(responseObserver, CreateUserResponse.newBuilder()
-                    .setResponse(ResponseBuilder.error(UserErrorCode.USER_CREATE_ERROR.getMessage() + SpecialChars.COLON_SPACE.getValue() + e.getMessage(), UserErrorCode.USER_CREATE_ERROR.getCode()))
-                    .build());
+
+        // Check for duplicate email
+        if (existsUserByEmail(createRequest.getEmail())) {
+            throw new DuplicateResourceException(
+                "USER_ALREADY_EXISTS",
+                "User with this email already exists",
+                String.format("User with email '%s' already exists", createRequest.getEmail())
+            );
         }
+
+        // Map request to entity and save
+        User newUser = userMapper.mapToUserEntity(createRequest);
+        User savedUser = saveUser(newUser);
+        CommonProto.User userProto = userMapper.toProto(savedUser);
+
+        // Return success response
+        CreateUserResponse response = CreateUserResponse.newBuilder()
+                .setResponse(ResponseBuilder.success("User created successfully"))
+                .setUser(userProto)
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
     }
 
     @Override
     public void getUser(GetUserRequest getUserRequest, StreamObserver<GetUserResponse> responseObserver) {
         log.info("Fetching user: {}", getUserRequest.getUserId());
-        
-        try {
-            Optional<User> foundUser = findUserById(getUserRequest.getUserId());
-            
-            if (foundUser.isEmpty()) {
-                StreamResponseHandler.respond(responseObserver, GetUserResponse.newBuilder()
-                        .setResponse(ResponseBuilder.error(UserErrorCode.USER_NOT_FOUND.getMessage(), UserErrorCode.USER_NOT_FOUND.getCode()))
-                        .build());
-                return;
-            }
-            
-            CommonProto.User userProto = userMapper.toProto(foundUser.get());
-            StreamResponseHandler.respond(responseObserver, GetUserResponse.newBuilder()
-                    .setResponse(ResponseBuilder.success("User found"))
-                    .setUser(userProto)
-                    .build());
-                    
-        } catch (Exception e) {
-            log.error("Error fetching user", e);
-            StreamResponseHandler.respond(responseObserver, GetUserResponse.newBuilder()
-                    .setResponse(ResponseBuilder.error(UserErrorCode.USER_FETCH_ERROR.getMessage() + SpecialChars.COLON_SPACE.getValue() + e.getMessage(), UserErrorCode.USER_FETCH_ERROR.getCode()))
-                    .build());
+
+        Optional<User> foundUser = findUserById(getUserRequest.getUserId());
+
+        if (foundUser.isEmpty()) {
+            throw new ResourceNotFoundException(
+                "USER_NOT_FOUND",
+                "User not found",
+                String.format("User with ID '%s' not found", getUserRequest.getUserId())
+            );
         }
+
+        CommonProto.User userProto = userMapper.toProto(foundUser.get());
+        GetUserResponse response = GetUserResponse.newBuilder()
+                .setResponse(ResponseBuilder.success("User found"))
+                .setUser(userProto)
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
     }
 
     @Override
     public void updateUser(UpdateUserRequest updateRequest, StreamObserver<UpdateUserResponse> responseObserver) {
         log.info("Updating user: {}", updateRequest.getUserId());
-        
-        try {
-            Optional<User> existingUserOpt = findUserById(updateRequest.getUserId());
-            
-            if (existingUserOpt.isEmpty()) {
-                StreamResponseHandler.respond(responseObserver, UpdateUserResponse.newBuilder()
-                        .setResponse(ResponseBuilder.error(UserErrorCode.USER_TO_UPDATE_NOT_FOUND.getMessage(), UserErrorCode.USER_TO_UPDATE_NOT_FOUND.getCode()))
-                        .build());
-                return;
-            }
-            
-            User existingUser = existingUserOpt.get();
-            userMapper.updateUserEntity(existingUser, updateRequest);
-            
-            User updatedUser = saveUser(existingUser);
-            CommonProto.User userProto = userMapper.toProto(updatedUser);
-            
-            StreamResponseHandler.respond(responseObserver, UpdateUserResponse.newBuilder()
-                    .setResponse(ResponseBuilder.success("User updated successfully"))
-                    .setUser(userProto)
-                    .build());
-                    
-        } catch (Exception e) {
-            log.error("Error updating user", e);
-            StreamResponseHandler.respond(responseObserver, UpdateUserResponse.newBuilder()
-                    .setResponse(ResponseBuilder.error(UserErrorCode.USER_UPDATE_ERROR.getMessage() + SpecialChars.COLON_SPACE.getValue() + e.getMessage(), UserErrorCode.USER_UPDATE_ERROR.getCode()))
-                    .build());
+
+        Optional<User> existingUserOpt = findUserById(updateRequest.getUserId());
+
+        if (existingUserOpt.isEmpty()) {
+            throw new ResourceNotFoundException(
+                "USER_NOT_FOUND",
+                "User to update not found",
+                String.format("User with ID '%s' not found", updateRequest.getUserId())
+            );
         }
+
+        User existingUser = existingUserOpt.get();
+        userMapper.updateUserEntity(existingUser, updateRequest);
+
+        User updatedUser = saveUser(existingUser);
+        CommonProto.User userProto = userMapper.toProto(updatedUser);
+
+        UpdateUserResponse response = UpdateUserResponse.newBuilder()
+                .setResponse(ResponseBuilder.success("User updated successfully"))
+                .setUser(userProto)
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
     }
 
     @Override
     public void deleteUser(DeleteUserRequest deleteRequest, StreamObserver<DeleteUserResponse> responseObserver) {
         log.info("Deleting user: {}", deleteRequest.getUserId());
-        
-        try {
-            if (!existsUserById(deleteRequest.getUserId())) {
-                StreamResponseHandler.respond(responseObserver, DeleteUserResponse.newBuilder()
-                        .setResponse(ResponseBuilder.error(UserErrorCode.USER_TO_DELETE_NOT_FOUND.getMessage(), UserErrorCode.USER_TO_DELETE_NOT_FOUND.getCode()))
-                        .build());
-                return;
-            }
-            
-            userRepository.deleteById(deleteRequest.getUserId());
-            StreamResponseHandler.respond(responseObserver, DeleteUserResponse.newBuilder()
-                    .setResponse(ResponseBuilder.success("User deleted successfully"))
-                    .build());
-                    
-        } catch (Exception e) {
-            log.error("Error deleting user", e);
-            StreamResponseHandler.respond(responseObserver, DeleteUserResponse.newBuilder()
-                    .setResponse(ResponseBuilder.error(UserErrorCode.USER_DELETE_ERROR.getMessage() + SpecialChars.COLON_SPACE.getValue() + e.getMessage(), UserErrorCode.USER_DELETE_ERROR.getCode()))
-                    .build());
+
+        if (!existsUserById(deleteRequest.getUserId())) {
+            throw new ResourceNotFoundException(
+                "USER_NOT_FOUND",
+                "User to delete not found",
+                String.format("User with ID '%s' not found", deleteRequest.getUserId())
+            );
         }
+
+        userRepository.deleteById(deleteRequest.getUserId());
+        DeleteUserResponse response = DeleteUserResponse.newBuilder()
+                .setResponse(ResponseBuilder.success("User deleted successfully"))
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
     }
 
     @Override
     public void validateUser(ValidateUserRequest validationRequest, StreamObserver<ValidateUserResponse> responseObserver) {
         log.info("Validating user: {}", validationRequest.getUserId());
-        
-        try {
-            Optional<User> foundUser = findUserById(validationRequest.getUserId());
-            
-            if (foundUser.isEmpty()) {
-                StreamResponseHandler.respond(responseObserver, ValidateUserResponse.newBuilder()
-                        .setIsValid(false)
-                        .setErrorMessage("User not found")
-                        .build());
-                return;
-            }
-            
-            CommonProto.User userProto = userMapper.toProto(foundUser.get());
-            StreamResponseHandler.respond(responseObserver, ValidateUserResponse.newBuilder()
-                    .setIsValid(true)
-                    .setUser(userProto)
-                    .build());
-                    
-        } catch (Exception e) {
-            log.error("Error validating user", e);
-            StreamResponseHandler.respond(responseObserver, ValidateUserResponse.newBuilder()
-                    .setIsValid(false)
-                    .setErrorMessage("Validation error: " + e.getMessage())
-                    .build());
+
+        Optional<User> foundUser = findUserById(validationRequest.getUserId());
+
+        if (foundUser.isEmpty()) {
+            throw new ResourceNotFoundException(
+                "USER_NOT_FOUND",
+                "User not found",
+                String.format("User with ID '%s' not found", validationRequest.getUserId())
+            );
         }
+
+        CommonProto.User userProto = userMapper.toProto(foundUser.get());
+        ValidateUserResponse response = ValidateUserResponse.newBuilder()
+                .setIsValid(true)
+                .setUser(userProto)
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
     }
     
     private User saveUser(User user) {
