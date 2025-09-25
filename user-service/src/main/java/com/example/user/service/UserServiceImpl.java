@@ -31,7 +31,7 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
         log.info("Creating user: {}", createRequest.getEmail());
         
         try {
-            if (userRepository.existsByEmailAddress(createRequest.getEmail())) {
+            if (existsUserByEmail(createRequest.getEmail())) {
                 StreamResponseHandler.respond(responseObserver, CreateUserResponse.newBuilder()
                         .setResponse(ResponseBuilder.error(UserErrorCode.USER_ALREADY_EXISTS.getMessage(), UserErrorCode.USER_ALREADY_EXISTS.getCode()))
                         .build());
@@ -40,7 +40,7 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
             
             User newUser = userMapper.mapToUserEntity(createRequest);
             
-            User savedUser = userRepository.save(newUser);
+            User savedUser = saveUser(newUser);
             CommonProto.User userProto = userMapper.toProto(savedUser);
             
             StreamResponseHandler.respond(responseObserver, CreateUserResponse.newBuilder()
@@ -61,7 +61,7 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
         log.info("Fetching user: {}", getUserRequest.getUserId());
         
         try {
-            Optional<User> foundUser = userRepository.findById(getUserRequest.getUserId());
+            Optional<User> foundUser = findUserById(getUserRequest.getUserId());
             
             if (foundUser.isEmpty()) {
                 StreamResponseHandler.respond(responseObserver, GetUserResponse.newBuilder()
@@ -89,7 +89,7 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
         log.info("Updating user: {}", updateRequest.getUserId());
         
         try {
-            Optional<User> existingUserOpt = userRepository.findById(updateRequest.getUserId());
+            Optional<User> existingUserOpt = findUserById(updateRequest.getUserId());
             
             if (existingUserOpt.isEmpty()) {
                 StreamResponseHandler.respond(responseObserver, UpdateUserResponse.newBuilder()
@@ -101,7 +101,7 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
             User existingUser = existingUserOpt.get();
             userMapper.updateUserEntity(existingUser, updateRequest);
             
-            User updatedUser = userRepository.save(existingUser);
+            User updatedUser = saveUser(existingUser);
             CommonProto.User userProto = userMapper.toProto(updatedUser);
             
             StreamResponseHandler.respond(responseObserver, UpdateUserResponse.newBuilder()
@@ -122,7 +122,7 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
         log.info("Deleting user: {}", deleteRequest.getUserId());
         
         try {
-            if (!userRepository.existsById(deleteRequest.getUserId())) {
+            if (!existsUserById(deleteRequest.getUserId())) {
                 StreamResponseHandler.respond(responseObserver, DeleteUserResponse.newBuilder()
                         .setResponse(ResponseBuilder.error(UserErrorCode.USER_TO_DELETE_NOT_FOUND.getMessage(), UserErrorCode.USER_TO_DELETE_NOT_FOUND.getCode()))
                         .build());
@@ -147,7 +147,7 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
         log.info("Validating user: {}", validationRequest.getUserId());
         
         try {
-            Optional<User> foundUser = userRepository.findById(validationRequest.getUserId());
+            Optional<User> foundUser = findUserById(validationRequest.getUserId());
             
             if (foundUser.isEmpty()) {
                 StreamResponseHandler.respond(responseObserver, ValidateUserResponse.newBuilder()
@@ -170,6 +170,33 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
                     .setErrorMessage("Validation error: " + e.getMessage())
                     .build());
         }
+    }
+    
+    // Helper methods for save operations
+    private User saveUser(User user) {
+        log.debug("Saving user with ID: {}", user.getUserId());
+        return userRepository.save(user);
+    }
+    
+    // Helper methods for find operations
+    private Optional<User> findUserById(Long userId) {
+        log.debug("Finding user by ID: {}", userId);
+        return userRepository.findById(userId);
+    }
+    
+    private Optional<User> findUserByEmail(String email) {
+        log.debug("Finding user by email: {}", email);
+        return userRepository.findByEmailAddress(email);
+    }
+    
+    private boolean existsUserByEmail(String email) {
+        log.debug("Checking if user exists by email: {}", email);
+        return userRepository.existsByEmailAddress(email);
+    }
+    
+    private boolean existsUserById(Long userId) {
+        log.debug("Checking if user exists by ID: {}", userId);
+        return userRepository.existsById(userId);
     }
     
 }

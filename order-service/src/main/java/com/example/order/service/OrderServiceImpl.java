@@ -57,13 +57,13 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
                     .currentStatus(OrderStatus.PENDING)
                     .build();
             
-            OrderEntity savedOrder = orderRepository.save(newOrder);
+            OrderEntity savedOrder = saveOrder(newOrder);
             
             List<OrderItemEntity> orderItems = orderMapper.mapToOrderItemEntities(
                     orderCreationRequest.getItemsList(), savedOrder);
             
             savedOrder.setOrderItems(orderItems);
-            orderRepository.save(savedOrder);
+            savedOrder = saveOrder(savedOrder);
             
             Order orderProto = orderMapper.toProto(savedOrder);
             
@@ -86,7 +86,7 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
         log.info("Get order: {}", request.getOrderId());
         
         try {
-            Optional<OrderEntity> orderEntityOpt = orderRepository.findById(request.getOrderId());
+            Optional<OrderEntity> orderEntityOpt = findOrderById(request.getOrderId());
             
             if (orderEntityOpt.isEmpty()) {
                 StreamResponseHandler.respond(responseObserver, GetOrderResponse.newBuilder()
@@ -126,7 +126,7 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
         log.info("Update order status: ID={}, Status={}", request.getOrderId(), request.getStatus());
         
         try {
-            Optional<OrderEntity> existingOrderOpt = orderRepository.findById(request.getOrderId());
+            Optional<OrderEntity> existingOrderOpt = findOrderById(request.getOrderId());
             
             if (existingOrderOpt.isEmpty()) {
                 StreamResponseHandler.respond(responseObserver, UpdateOrderStatusResponse.newBuilder()
@@ -138,7 +138,7 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
             OrderEntity existingOrder = existingOrderOpt.get();
             existingOrder.setCurrentStatus(orderMapper.mapToEntityOrderStatus(request.getStatus()));
             
-            OrderEntity updatedOrder = orderRepository.save(existingOrder);
+            OrderEntity updatedOrder = saveOrder(existingOrder);
             Order orderProto = orderMapper.toProto(updatedOrder);
             
             StreamResponseHandler.respond(responseObserver, UpdateOrderStatusResponse.newBuilder()
@@ -167,7 +167,7 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
                 return;
             }
             
-            List<OrderEntity> customerOrders = orderRepository.findByCustomerId(request.getUserId());
+            List<OrderEntity> customerOrders = findOrdersByCustomerId(request.getUserId());
             List<Order> orderProtos = customerOrders.stream()
                     .map(orderMapper::toProto)
                     .toList();
@@ -191,7 +191,7 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
         log.info("Cancel order: {}", request.getOrderId());
         
         try {
-            Optional<OrderEntity> existingOrderOpt = orderRepository.findById(request.getOrderId());
+            Optional<OrderEntity> existingOrderOpt = findOrderById(request.getOrderId());
             
             if (existingOrderOpt.isEmpty()) {
                 StreamResponseHandler.respond(responseObserver, CancelOrderResponse.newBuilder()
@@ -210,7 +210,7 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
             }
             
             existingOrder.setCurrentStatus(OrderStatus.CANCELLED);
-            OrderEntity cancelledOrder = orderRepository.save(existingOrder);
+            OrderEntity cancelledOrder = saveOrder(existingOrder);
             Order orderProto = orderMapper.toProto(cancelledOrder);
             
             StreamResponseHandler.respond(responseObserver, CancelOrderResponse.newBuilder()
@@ -238,6 +238,22 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
                 .setUserId(customerId)
                 .build();
         return userServiceStub.getUser(customerDetailsRequest);
+    }
+    
+    private OrderEntity saveOrder(OrderEntity order) {
+        log.debug("Saving order with ID: {}", order.getOrderId());
+        return orderRepository.save(order);
+    }
+    
+    // Helper methods for find operations
+    private Optional<OrderEntity> findOrderById(Long orderId) {
+        log.debug("Finding order by ID: {}", orderId);
+        return orderRepository.findById(orderId);
+    }
+    
+    private List<OrderEntity> findOrdersByCustomerId(Long customerId) {
+        log.debug("Finding orders for customer ID: {}", customerId);
+        return orderRepository.findByCustomerId(customerId);
     }
     
 }
