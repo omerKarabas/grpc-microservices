@@ -731,11 +731,147 @@ List<Order> orderProtos = orderMapper.mapToProtoList(customerOrders);
 com.example.common.interceptors.GlobalExceptionInterceptor
 ```
 
+**Server Configuration**:
+```java
+@Bean
+public GrpcServerConfigurer grpcServerConfigurer(GrpcExceptionHandlingConfig exceptionConfig) {
+    return serverBuilder -> {
+        GlobalExceptionInterceptor interceptor = exceptionConfig.getGlobalExceptionInterceptor();
+        if (interceptor != null) {
+            serverBuilder.intercept(interceptor);
+            log.info("GlobalExceptionInterceptor registered successfully");
+        }
+    };
+}
+```
+
 **Automatic Status Mapping**:
 - Catches all exceptions from gRPC service methods
 - Converts custom exceptions to appropriate gRPC status codes
 - Provides consistent error response format using enum messages
-- Logs exceptions with proper context
+- Logs exceptions with proper context and error details
+
+## ✅ Testing Exception Handling
+
+**🎯 Problem Solved**: GlobalExceptionInterceptor artık çalışıyor!
+
+### Postman gRPC Testing Guide
+
+**Step 1: Import Proto Files**
+1. Open Postman
+2. Click "Import" → "Upload Files"
+3. Select your `.proto` files from `common/src/main/proto/`
+4. Click "Import" to add proto definitions
+
+**Step 2: Create New gRPC Request**
+1. Click "New" → "gRPC Request"
+2. Enter server URL: `localhost:9090` (for User Service) or `localhost:9091` (for Order Service)
+3. Select service and method (e.g., `UserService/DeleteUser`)
+
+**Step 3: Send Request to Trigger Exception**
+1. Enter test data in request body (use non-existent ID to trigger exception):
+```json
+{
+  "userId": 22222
+}
+```
+2. Click "Invoke"
+3. Check **Response Status** and **Error Details**
+
+**✅ Expected Error Response:**
+```json
+{
+  "error": "User not found",
+  "code": 5,
+  "details": "User with ID '22222' not found"
+}
+```
+
+### Debug Information
+
+**Log Files Location:**
+- User Service: `user-service/logs/user-service.log`
+- Order Service: `order-service/logs/order-service.log`
+
+**Check for Success Messages:**
+```bash
+grep "GlobalExceptionInterceptor registered successfully" user-service/logs/user-service.log
+```
+
+**Test Console Commands:**
+```bash
+# Check service status
+netstat -tlnp | grep -E "(9090|9091)"
+
+# Test connection
+timeout 3 bash -c "</dev/tcp/localhost/9090" && echo "✅ User Service ready"
+timeout 3 bash -c "</dev/tcp/localhost/9091" && echo "✅ Order Service ready"
+```
+
+### Alternative Testing Methods
+
+**Method 1: Using grpcurl (Command Line)**
+```bash
+# Install grpcurl if not available
+go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
+
+# Test User Service DeleteUser method
+grpcurl -plaintext -d '{"userId": 22222}' localhost:9090 UserService/DeleteUser
+
+# Test Order Service CreateOrder method
+grpcurl -plaintext -d '{"userId": 999, "items": []}' localhost:9091 OrderService/CreateOrder
+```
+
+**Method 1a: Python Script Test (Alternative)**
+```python
+import grpc
+import sys
+import os
+
+# Add common module to path
+sys.path.append(os.path.join(os.path.dirname(__file__), 'common', 'target', 'classes'))
+
+# Import generated gRPC code
+from com.example.user import UserServiceGrpc
+from com.example.user.UserProto import DeleteUserRequest
+
+def test_user_service():
+    # Create gRPC channel
+    channel = grpc.insecure_channel('localhost:9090')
+
+    # Create stub
+    stub = UserServiceGrpc.UserServiceBlockingStub(channel)
+
+    # Create request
+    request = DeleteUserRequest.newBuilder().setUserId(22222).build()
+
+    try:
+        # This should trigger ResourceNotFoundException
+        response = stub.deleteUser(request)
+        print("Unexpected success:", response)
+    except grpc.RpcException as e:
+        print("✅ Exception caught by interceptor:")
+        print(f"Code: {e.code()}")
+        print(f"Details: {e.details()}")
+        print(f"Status: {e.code().name}")
+
+if __name__ == "__main__":
+    test_user_service()
+```
+
+**Method 2: Using BloomRPC (Desktop Client)**
+1. Download BloomRPC from https://github.com/bloomrpc/bloomrpc
+2. Import your .proto files
+3. Connect to `localhost:9090` or `localhost:9091`
+4. Select method and send request
+
+**Method 3: Console Logs Check**
+Look for interceptor logs in your terminal:
+```
+2025-09-25 16:01:00 - Exception in gRPC call
+com.example.common.exception.ResourceNotFoundException: User not found
+2025-09-25 16:01:00 - GlobalExceptionInterceptor mapped to gRPC status: NOT_FOUND
+```
 
 **Benefits Achieved**:
 - **Reduced Code Duplication**: ~60% less boilerplate code

@@ -7,11 +7,13 @@ import com.example.common.exception.ResourceNotFoundException;
 import com.example.common.exception.ValidationException;
 import io.grpc.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 /**
  * Global gRPC interceptor for centralized exception handling
  * Catches all exceptions from gRPC service methods and converts them to appropriate gRPC status
  */
+@Component
 @Slf4j
 public class GlobalExceptionInterceptor implements ServerInterceptor {
 
