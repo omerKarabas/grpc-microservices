@@ -1,6 +1,6 @@
 package com.example.common.config;
 
-import com.example.common.grpc.GlobalExceptionInterceptor;
+import com.example.common.interceptors.GlobalExceptionInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;

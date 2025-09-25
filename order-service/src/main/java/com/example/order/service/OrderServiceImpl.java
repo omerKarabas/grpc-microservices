@@ -5,6 +5,7 @@ import com.example.common.ResponseBuilder;
 import com.example.common.exception.BusinessException;
 import com.example.common.exception.ResourceNotFoundException;
 import com.example.order.OrderProto.*;
+import com.example.order.constants.OrderErrorCode;
 import com.example.order.entity.OrderEntity;
 import com.example.order.entity.OrderItemEntity;
 import com.example.order.entity.OrderStatus;
@@ -43,8 +44,7 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
         ValidateUserResponse customerValidation = validateCustomer(orderCreationRequest.getUserId());
         if (!customerValidation.getIsValid()) {
             throw new BusinessException(
-                "INVALID_CUSTOMER",
-                "Customer validation failed: " + customerValidation.getErrorMessage(),
+                OrderErrorCode.INVALID_CUSTOMER,
                 String.format("Customer validation failed for user ID '%s': %s", orderCreationRequest.getUserId(), customerValidation.getErrorMessage())
             );
         }
@@ -88,8 +88,7 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
 
         if (orderEntityOpt.isEmpty()) {
             throw new ResourceNotFoundException(
-                "ORDER_NOT_FOUND",
-                "Order not found",
+                OrderErrorCode.ORDER_NOT_FOUND,
                 String.format("Order with ID '%s' not found", request.getOrderId())
             );
         }
@@ -99,8 +98,7 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
 
         if (!customerResponse.getResponse().getSuccess()) {
             throw new BusinessException(
-                "CUSTOMER_NOT_FOUND",
-                "Customer not found for order",
+                OrderErrorCode.CUSTOMER_NOT_FOUND,
                 String.format("Customer with ID '%s' not found for order '%s'", foundOrder.getCustomerId(), request.getOrderId())
             );
         }
@@ -125,8 +123,7 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
 
         if (existingOrderOpt.isEmpty()) {
             throw new ResourceNotFoundException(
-                "ORDER_NOT_FOUND",
-                "Order to update not found",
+                OrderErrorCode.ORDER_TO_UPDATE_NOT_FOUND,
                 String.format("Order with ID '%s' not found", request.getOrderId())
             );
         }
@@ -153,8 +150,7 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
         ValidateUserResponse customerValidation = validateCustomer(request.getUserId());
         if (!customerValidation.getIsValid()) {
             throw new BusinessException(
-                "INVALID_CUSTOMER",
-                "Customer validation failed: " + customerValidation.getErrorMessage(),
+                OrderErrorCode.INVALID_CUSTOMER,
                 String.format("Customer validation failed for user ID '%s': %s", request.getUserId(), customerValidation.getErrorMessage())
             );
         }
@@ -182,8 +178,7 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
 
         if (existingOrderOpt.isEmpty()) {
             throw new ResourceNotFoundException(
-                "ORDER_NOT_FOUND",
-                "Order to cancel not found",
+                OrderErrorCode.ORDER_TO_CANCEL_NOT_FOUND,
                 String.format("Order with ID '%s' not found", request.getOrderId())
             );
         }
@@ -192,8 +187,7 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
 
         if (existingOrder.getCurrentStatus() == OrderStatus.DELIVERED) {
             throw new BusinessException(
-                "ORDER_CANNOT_CANCEL",
-                "Cannot cancel delivered order",
+                OrderErrorCode.ORDER_CANNOT_CANCEL,
                 String.format("Cannot cancel order '%s' with status DELIVERED", request.getOrderId())
             );
         }
@@ -230,7 +224,6 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
         return orderRepository.save(order);
     }
     
-    // Helper methods for find operations
     private Optional<OrderEntity> findOrderById(Long orderId) {
         log.debug("Finding order by ID: {}", orderId);
         return orderRepository.findById(orderId);

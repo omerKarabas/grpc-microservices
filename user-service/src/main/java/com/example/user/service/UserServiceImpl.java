@@ -5,6 +5,7 @@ import com.example.common.ResponseBuilder;
 import com.example.common.exception.DuplicateResourceException;
 import com.example.common.exception.ResourceNotFoundException;
 import com.example.user.UserProto.*;
+import com.example.user.constants.UserErrorCode;
 import com.example.user.entity.User;
 import com.example.user.mapper.UserMapper;
 import com.example.user.repository.UserRepository;
@@ -32,8 +33,7 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
         // Check for duplicate email
         if (existsUserByEmail(createRequest.getEmail())) {
             throw new DuplicateResourceException(
-                "USER_ALREADY_EXISTS",
-                "User with this email already exists",
+                UserErrorCode.USER_ALREADY_EXISTS,
                 String.format("User with email '%s' already exists", createRequest.getEmail())
             );
         }
@@ -61,8 +61,7 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
 
         if (foundUser.isEmpty()) {
             throw new ResourceNotFoundException(
-                "USER_NOT_FOUND",
-                "User not found",
+                UserErrorCode.USER_NOT_FOUND,
                 String.format("User with ID '%s' not found", getUserRequest.getUserId())
             );
         }
@@ -85,8 +84,7 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
 
         if (existingUserOpt.isEmpty()) {
             throw new ResourceNotFoundException(
-                "USER_NOT_FOUND",
-                "User to update not found",
+                UserErrorCode.USER_TO_UPDATE_NOT_FOUND,
                 String.format("User with ID '%s' not found", updateRequest.getUserId())
             );
         }
@@ -112,8 +110,7 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
 
         if (!existsUserById(deleteRequest.getUserId())) {
             throw new ResourceNotFoundException(
-                "USER_NOT_FOUND",
-                "User to delete not found",
+                UserErrorCode.USER_TO_DELETE_NOT_FOUND,
                 String.format("User with ID '%s' not found", deleteRequest.getUserId())
             );
         }
@@ -135,8 +132,7 @@ public class UserServiceImpl extends com.example.user.UserServiceGrpc.UserServic
 
         if (foundUser.isEmpty()) {
             throw new ResourceNotFoundException(
-                "USER_NOT_FOUND",
-                "User not found",
+                UserErrorCode.USER_NOT_FOUND,
                 String.format("User with ID '%s' not found", validationRequest.getUserId())
             );
         }

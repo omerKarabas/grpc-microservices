@@ -636,22 +636,28 @@ mvn -version   # Should be 3.6+
 
 ## Exception Handling Architecture
 
-### Centralized Exception Hierarchy
+### Centralized Exception Hierarchy with Error Code Enums
 
-**Implemented Exception Types**:
-- **`BaseException`**: Abstract base class with gRPC status mapping
-- **`ResourceNotFoundException`**: Maps to `NOT_FOUND` status (User/Order not found)
-- **`DuplicateResourceException`**: Maps to `ALREADY_EXISTS` status (Email already exists)
-- **`BusinessException`**: Maps to `INVALID_ARGUMENT` status (Business rule violations)
+**Implemented Exception Types & Error Code Integration**:
+- **`BaseException`**: Abstract base class with gRPC status mapping and enum support
+- **`ResourceNotFoundException`**: Maps to `NOT_FOUND` status (Uses `UserErrorCode.USER_NOT_FOUND`, `OrderErrorCode.ORDER_NOT_FOUND`)
+- **`DuplicateResourceException`**: Maps to `ALREADY_EXISTS` status (Uses `UserErrorCode.USER_ALREADY_EXISTS`)
+- **`BusinessException`**: Maps to `INVALID_ARGUMENT` status (Uses `OrderErrorCode.INVALID_CUSTOMER`, `OrderErrorCode.CUSTOMER_NOT_FOUND`)
 - **`ValidationException`**: Maps to `INVALID_ARGUMENT` status (Input validation failures)
 
 **Exception Mapping Table**:
-| Exception Type | gRPC Status | HTTP Equivalent | Use Case |
-|----------------|-------------|-----------------|----------|
-| `ResourceNotFoundException` | `NOT_FOUND` | 404 | Entity not found |
-| `DuplicateResourceException` | `ALREADY_EXISTS` | 409 | Duplicate entity |
-| `BusinessException` | `INVALID_ARGUMENT` | 400 | Business rule violation |
-| `ValidationException` | `INVALID_ARGUMENT` | 400 | Input validation failure |
+| Exception Type | gRPC Status | HTTP Equivalent | Error Code Enum | Use Case |
+|----------------|-------------|-----------------|-----------------|----------|
+| `ResourceNotFoundException` | `NOT_FOUND` | 404 | `UserErrorCode.USER_NOT_FOUND` | Entity not found |
+| `DuplicateResourceException` | `ALREADY_EXISTS` | 409 | `UserErrorCode.USER_ALREADY_EXISTS` | Duplicate entity |
+| `BusinessException` | `INVALID_ARGUMENT` | 400 | `OrderErrorCode.INVALID_CUSTOMER` | Business rule violation |
+| `ValidationException` | `INVALID_ARGUMENT` | 400 | Custom validation codes | Input validation failure |
+
+**Error Code Enum Integration**:
+- **UserErrorCode**: Contains user-related error codes and messages
+- **OrderErrorCode**: Contains order-related error codes and messages
+- **Consistent Error Messages**: Standardized error messages from enum constants
+- **Type Safety**: Compile-time checking of error codes
 
 ### Code Quality Improvements
 
@@ -670,13 +676,12 @@ public void createUser(CreateUserRequest request, StreamObserver<CreateUserRespo
 }
 ```
 
-**After Refactor** (Clean exception throwing):
+**After Refactor** (Clean exception throwing with Error Code Enums):
 ```java
 public void createUser(CreateUserRequest request, StreamObserver<CreateUserResponse> responseObserver) {
     if (existsUserByEmail(request.getEmail())) {
         throw new DuplicateResourceException(
-            "USER_ALREADY_EXISTS",
-            "User with this email already exists",
+            UserErrorCode.USER_ALREADY_EXISTS,  // Uses predefined error code & message
             String.format("User with email '%s' already exists", request.getEmail())
         );
     }
@@ -687,20 +692,50 @@ public void createUser(CreateUserRequest request, StreamObserver<CreateUserRespo
 }
 ```
 
+**Error Code Enum Usage**:
+```java
+// User Service - Using UserErrorCode enum (message from enum)
+throw new ResourceNotFoundException(
+    UserErrorCode.USER_NOT_FOUND,  // Message: "User not found"
+    String.format("User with ID '%s' not found", userId)
+);
+
+// Order Service - Using OrderErrorCode enum (message from enum)
+throw new BusinessException(
+    OrderErrorCode.INVALID_CUSTOMER,  // Message: "Invalid customer"
+    String.format("Customer validation failed for user ID '%s'", userId)
+);
+
+// Simple enum usage without additional details
+throw new DuplicateResourceException(
+    UserErrorCode.USER_ALREADY_EXISTS,  // Message: "User with email already exists"
+    "Additional technical details"
+);
+```
+
 ### Global Exception Interceptor
+
+**Package Structure**:
+```
+com.example.common.interceptors.GlobalExceptionInterceptor
+```
 
 **Automatic Status Mapping**:
 - Catches all exceptions from gRPC service methods
 - Converts custom exceptions to appropriate gRPC status codes
-- Provides consistent error response format
+- Provides consistent error response format using enum messages
 - Logs exceptions with proper context
 
 **Benefits Achieved**:
 - **Reduced Code Duplication**: ~60% less boilerplate code
-- **Consistent Error Handling**: Standardized error responses
-- **Better Maintainability**: Single point of exception handling logic
-- **Proper gRPC Status Codes**: Correct HTTP-like status mapping
-- **Enhanced Debugging**: Structured exception information
+- **Consistent Error Handling**: Standardized error responses using enum constants and messages
+- **Better Maintainability**: Single point of exception handling logic in interceptors package
+- **Proper gRPC Status Codes**: Correct HTTP-like status mapping with enum integration
+- **Enhanced Debugging**: Structured exception information with consistent error codes
+- **Type Safety**: Compile-time checking of error codes through enums
+- **Centralized Error Messages**: All error messages automatically extracted from enum constants
+- **Maintainable Error Catalog**: Easy to add new error codes and modify existing ones
+- **Clean Package Structure**: Exception handling logic organized in dedicated interceptors package
 
 ## Resources
 

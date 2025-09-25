@@ -1,4 +1,4 @@
-package com.example.common.grpc;
+package com.example.common.interceptors;
 
 import com.example.common.exception.BaseException;
 import com.example.common.exception.BusinessException;
