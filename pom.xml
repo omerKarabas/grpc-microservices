@@ -109,7 +109,7 @@
             <!-- Project Modules -->
             <dependency>
                 <groupId>com.example</groupId>
-                <artifactId>shared-proto</artifactId>
+                <artifactId>common</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>
