@@ -22,6 +22,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import static com.example.common.util.CollectionUtil.sum;
+
 @GrpcService
 @Service
 @RequiredArgsConstructor
@@ -46,14 +48,10 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
                         .build());
                 return;
             }
-            
-            double calculatedTotalPrice = orderCreationRequest.getItemsList().stream()
-                    .mapToDouble(item -> item.getPrice() * item.getQuantity())
-                    .sum();
-            
+
             OrderEntity newOrder = OrderEntity.builder()
                     .customerId(orderCreationRequest.getUserId())
-                    .totalPrice(calculatedTotalPrice)
+                    .totalPrice(calculateTotalPrice(orderCreationRequest))
                     .currentStatus(OrderStatus.PENDING)
                     .build();
             
@@ -79,6 +77,10 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
                     .setResponse(ResponseBuilder.error(OrderErrorCode.ORDER_CREATE_ERROR.getMessage() + SpecialChars.COLON_SPACE.getValue() + e.getMessage(), OrderErrorCode.ORDER_CREATE_ERROR.getCode()))
                     .build());
         }
+    }
+
+    private double calculateTotalPrice(CreateOrderRequest orderCreationRequest) {
+        return sum(orderCreationRequest.getItemsList(), item -> item.getPrice() * item.getQuantity());
     }
 
     @Override

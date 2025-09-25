@@ -3,6 +3,8 @@ package com.example.common.util;
 import lombok.experimental.UtilityClass;
 
 import java.util.Collection;
+import java.util.Objects;
+import java.util.function.Function;
 
 /**
  * Utility class for common collection operations and validations.
@@ -28,4 +30,22 @@ public class CollectionUtil {
     public static boolean isNotEmpty(Collection<?> collection) {
         return !isEmpty(collection);
     }
+
+    /**
+     * Calculate sum of numeric values from collection elements
+     * @param collection The collection to process
+     * @param mapper Function to extract numeric value from each element
+     * @param <T> Type of collection elements
+     * @return Sum of all values, 0.0 if collection is null or empty
+     */
+    public static <T> double sum(Collection<T> collection, Function<T, Double> mapper) {
+        if (isEmpty(collection)) {
+            return 0.0;
+        }
+        return collection.stream()
+                .mapToDouble(mapper::apply)
+                .filter(Objects::nonNull)
+                .sum();
+    }
+
 }
