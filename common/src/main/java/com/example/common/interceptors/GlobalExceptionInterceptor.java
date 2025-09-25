@@ -93,14 +93,12 @@ public class GlobalExceptionInterceptor implements ServerInterceptor {
         }
 
         private Status mapExceptionToStatus(Exception e) {
-            if (e instanceof BaseException) {
-                BaseException baseException = (BaseException) e;
+            if (e instanceof BaseException baseException) {
                 return Status.fromCode(baseException.getGrpcStatusCode())
                         .withDescription(baseException.getUserMessage())
                         .withCause(e);
             }
 
-            // Handle specific exception types
             if (e instanceof IllegalArgumentException) {
                 return Status.INVALID_ARGUMENT
                         .withDescription("Invalid argument provided")
@@ -119,7 +117,6 @@ public class GlobalExceptionInterceptor implements ServerInterceptor {
                         .withCause(e);
             }
 
-            // Default to internal error for unknown exceptions
             return Status.INTERNAL
                     .withDescription("Internal server error")
                     .withCause(e);
