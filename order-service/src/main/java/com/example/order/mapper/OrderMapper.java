@@ -88,4 +88,19 @@ public class OrderMapper {
             default -> OrderStatus.UNKNOWN;
         };
     }
+
+    /**
+     * Maps a list of OrderEntity to a list of Order proto objects
+     * @param orderEntities List of OrderEntity objects
+     * @return List of Order proto objects
+     */
+    public List<Order> mapToProtoList(List<OrderEntity> orderEntities) {
+        if (CollectionUtil.isEmpty(orderEntities)) {
+            return List.of();
+        }
+
+        return orderEntities.stream()
+                .map(this::toProto)
+                .toList();
+    }
 }

@@ -713,6 +713,17 @@ throw new DuplicateResourceException(
 );
 ```
 
+**Mapper Integration**:
+```java
+// Before: Manual stream mapping in service layer
+List<Order> orderProtos = customerOrders.stream()
+    .map(orderMapper::toProto)
+    .toList();
+
+// After: Clean mapper method usage
+List<Order> orderProtos = orderMapper.mapToProtoList(customerOrders);
+```
+
 ### Global Exception Interceptor
 
 **Package Structure**:
@@ -736,6 +747,8 @@ com.example.common.interceptors.GlobalExceptionInterceptor
 - **Centralized Error Messages**: All error messages automatically extracted from enum constants
 - **Maintainable Error Catalog**: Easy to add new error codes and modify existing ones
 - **Clean Package Structure**: Exception handling logic organized in dedicated interceptors package
+- **Mapper Encapsulation**: Mapping logic moved from service layer to dedicated mapper classes
+- **Clean Service Layer**: Service methods focus on business logic, not data transformation
 
 ## Resources
 

@@ -156,9 +156,7 @@ public class OrderServiceImpl extends com.example.order.OrderServiceGrpc.OrderSe
         }
 
         List<OrderEntity> customerOrders = findOrdersByCustomerId(request.getUserId());
-        List<Order> orderProtos = customerOrders.stream()
-                .map(orderMapper::toProto)
-                .toList();
+        List<Order> orderProtos = orderMapper.mapToProtoList(customerOrders);
 
         GetUserOrdersResponse response = GetUserOrdersResponse.newBuilder()
                 .setResponse(ResponseBuilder.success("Customer orders found"))
